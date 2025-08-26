@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   Cloud,
@@ -21,6 +21,7 @@ import {
   Settings,
   Search,
   Camera,
+  CheckCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -56,6 +57,7 @@ export default function DashboardPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profilePicInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -64,9 +66,30 @@ export default function DashboardPage() {
   const [fileToDelete, setFileToDelete] = useState<AppFile | null>(null);
   const [userPhoneNumber, setUserPhoneNumber] = useState<string | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>('https://picsum.photos/100/100');
+  const [isVerified, setIsVerified] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
 
   useEffect(() => {
+    const token = searchParams.get('token');
     const storedPhoneNumber = localStorage.getItem('userPhoneNumber');
+
+    if (token && storedPhoneNumber) {
+        setShowVerificationMessage(true);
+        // Simulate verification and show dashboard after a delay
+        setTimeout(() => {
+            setIsVerified(true);
+            setShowVerificationMessage(false);
+            // Clean the URL
+            router.replace('/dashboard', undefined);
+        }, 2500);
+    } else if (storedPhoneNumber) {
+        // If user is already "logged in" (has phone number) but no token, show dashboard
+        setIsVerified(true);
+    } else {
+        // If no phone number, redirect to login
+        router.push('/login');
+    }
+
     if (storedPhoneNumber) {
       setUserPhoneNumber(storedPhoneNumber);
     }
@@ -74,7 +97,7 @@ export default function DashboardPage() {
     if (storedProfilePic) {
       setProfilePic(storedProfilePic);
     }
-  }, []);
+  }, [searchParams, router]);
   
   const handleProfilePicChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -191,6 +214,30 @@ export default function DashboardPage() {
   };
   
   const filteredFiles = files.filter(file => file.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  if (showVerificationMessage) {
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+            <Card className="p-8 text-center shadow-2xl">
+                <CardContent className="flex flex-col items-center gap-4">
+                    <CheckCircle className="h-16 w-16 text-green-500 animate-pulse" />
+                    <h1 className="text-2xl font-bold">Successfully verified By Telegram</h1>
+                    <p className="text-muted-foreground">Redirecting to your dashboard...</p>
+                </CardContent>
+            </Card>
+        </div>
+    );
+  }
+
+  if (!isVerified) {
+    // You can show a loading spinner here while verifying
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+            <p>Loading...</p>
+        </div>
+    );
+  }
+
 
   return (
     <div className="flex min-h-screen flex-col bg-secondary/30">
@@ -385,5 +432,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
