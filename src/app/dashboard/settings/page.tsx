@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -201,7 +202,7 @@ export default function SettingsPage() {
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground" />
                 </Link>
-                <Link href="#" className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 px-2 rounded-md">
+                <Link href="/dashboard/contact" className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 px-2 rounded-md">
                     <div className="flex items-center gap-3">
                         <MessageSquare className="h-5 w-5 text-muted-foreground"/>
                         <p>Contact Us</p>
