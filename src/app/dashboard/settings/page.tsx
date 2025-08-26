@@ -16,6 +16,7 @@ import {
   Bell,
   HardDrive,
   Gift,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,14 +27,19 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
     const [isStorageClaimed, setIsStorageClaimed] = useState(false);
+    const [isClaiming, setIsClaiming] = useState(false);
     const { toast } = useToast();
 
     const handleClaimStorage = () => {
-        setIsStorageClaimed(true);
-        toast({
-            title: 'Congratulations! 🎉',
-            description: 'You have claimed Unlimited Cloud Storage for free.',
-        })
+        setIsClaiming(true);
+        setTimeout(() => {
+            setIsStorageClaimed(true);
+            setIsClaiming(false);
+            toast({
+                title: 'Congratulations! 🎉',
+                description: 'You have claimed Unlimited Cloud Storage for free.',
+            })
+        }, 5000);
     }
 
   return (
@@ -103,8 +109,13 @@ export default function SettingsPage() {
                     <Gift className="h-12 w-12 text-primary"/>
                     <p className="font-semibold">You have a special gift!</p>
                     <p className="text-muted-foreground">Claim your free unlimited cloud storage now.</p>
-                    <Button onClick={handleClaimStorage}>
-                        <Gift className="mr-2 h-4 w-4" /> Claim Now
+                    <Button onClick={handleClaimStorage} disabled={isClaiming}>
+                        {isClaiming ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                            <Gift className="mr-2 h-4 w-4" />
+                        )}
+                        {isClaiming ? 'Claiming...' : 'Claim Now'}
                     </Button>
                 </CardContent>
              )}
