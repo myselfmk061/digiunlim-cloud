@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import { ScrollArea } from './ui/scroll-area';
 
 const FormSchema = z.object({
   countryCode: z.string().min(1, 'Country code is required.'),
@@ -36,15 +37,35 @@ const FormSchema = z.object({
 });
 
 const countryCodes = [
-  { value: '+1', label: '🇺🇸 +1' },
-  { value: '+44', label: '🇬🇧 +44' },
-  { value: '+91', label: '🇮🇳 +91' },
-  { value: '+86', label: '🇨🇳 +86' },
-  { value: '+81', label: '🇯🇵 +81' },
-  { value: '+49', label: '🇩🇪 +49' },
-  { value: '+7', label: '🇷🇺 +7' },
-  { value: '+55', label: '🇧🇷 +55' },
+    { value: '+91', label: '🇮🇳 +91' },
+    { value: '+1', label: '🇺🇸 +1' },
+    { value: '+44', label: '🇬🇧 +44' },
+    { value: '+61', label: '🇦🇺 +61' },
+    { value: '+81', label: '🇯🇵 +81' },
+    { value: '+49', label: '🇩🇪 +49' },
+    { value: '+7', label: '🇷🇺 +7' },
+    { value: '+33', label: '🇫🇷 +33' },
+    { value: '+39', label: '🇮🇹 +39' },
+    { value: '+52', label: '🇲🇽 +52' },
+    { value: '+55', label: '🇧🇷 +55' },
+    { value: '+86', label: '🇨🇳 +86' },
+    { value: '+34', label: '🇪🇸 +34' },
+    { value: '+92', label: '🇵🇰 +92' },
+    { value: '+880', label: '🇧🇩 +880' },
+    { value: '+20', label: '🇪🇬 +20' },
+    { value: '+234', label: '🇳🇬 +234' },
+    { value: '+971', label: '🇦🇪 +971' },
+    { value: '+966', label: '🇸🇦 +966' },
+    { value: '+27', label: '🇿🇦 +27' },
+    { value: '+60', label: '🇲🇾 +60' },
+    { value: '+62', label: '🇮🇩 +62' },
+    { value: '+63', label: '🇵🇭 +63' },
+    { value: '+65', label: '🇸🇬 +65' },
+    { value: '+66', label: '🇹🇭 +66' },
+    { value: '+82', label: '🇰🇷 +82' },
+    { value: '+84', label: '🇻🇳 +84' },
 ];
+
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +76,7 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      countryCode: '+1',
+      countryCode: '+91',
       phoneNumber: '',
     },
   });
@@ -142,9 +163,11 @@ export function LoginForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {countryCodes.map((country) => (
-                           <SelectItem key={country.value} value={country.value}>{country.label}</SelectItem>
-                        ))}
+                        <ScrollArea className="h-72">
+                            {countryCodes.map((country) => (
+                               <SelectItem key={country.value} value={country.value}>{country.label}</SelectItem>
+                            ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                     <FormMessage />
