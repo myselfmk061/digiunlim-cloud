@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, ChangeEvent } from 'react';
+import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -57,8 +57,17 @@ export default function DashboardPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [shareLink, setShareLink] = useState('');
   const [fileToDelete, setFileToDelete] = useState<AppFile | null>(null);
+  const [userPhoneNumber, setUserPhoneNumber] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedPhoneNumber = localStorage.getItem('userPhoneNumber');
+    if (storedPhoneNumber) {
+      setUserPhoneNumber(storedPhoneNumber);
+    }
+  }, []);
 
   const handleLogout = () => {
+    localStorage.removeItem('userPhoneNumber');
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     router.push('/');
   };
@@ -187,6 +196,10 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto flex-1 p-4 md:p-6">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">Welcome back!</h1>
+          {userPhoneNumber && <p className="text-muted-foreground">Signed in as {userPhoneNumber}</p>}
+        </div>
         <div
           className={`relative mb-8 cursor-pointer rounded-lg border-2 border-dashed border-primary/50 bg-background p-8 text-center transition-colors duration-300 hover:border-primary hover:bg-primary/5 ${
             isDragging ? 'border-primary bg-primary/10' : ''

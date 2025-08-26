@@ -74,6 +74,10 @@ export function LoginForm() {
     
     // Simulate user verifying and being redirected
     setTimeout(() => {
+        // Save user info to localStorage
+        const fullPhoneNumber = `${data.countryCode} ${data.phoneNumber}`;
+        localStorage.setItem('userPhoneNumber', fullPhoneNumber);
+
         setIsLoading(false);
         router.push('/dashboard');
     }, 1500)
