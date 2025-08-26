@@ -1,3 +1,161 @@
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle, Cloud, FileLock, Share2 } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+
 export default function Home() {
-  return <></>;
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+        <Link href="#" className="flex items-center gap-2" prefetch={false}>
+          <Cloud className="h-6 w-6 text-primary" />
+          <span className="text-lg font-bold">DigiUnLim Cloud</span>
+        </Link>
+        <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+          <Link
+            href="#features"
+            className="text-foreground/80 transition-colors hover:text-foreground"
+            prefetch={false}
+          >
+            Features
+          </Link>
+          <Link
+            href="#pricing"
+            className="text-foreground/80 transition-colors hover:text-foreground"
+            prefetch={false}
+          >
+            Pricing
+          </Link>
+          <Link
+            href="#contact"
+            className="text-foreground/80 transition-colors hover:text-foreground"
+            prefetch={false}
+          >
+            Contact
+          </Link>
+        </nav>
+        <Button asChild>
+          <Link href="/login">Get Started</Link>
+        </Button>
+      </header>
+      <main className="flex-1">
+        <section className="relative py-12 md:py-24 lg:py-32">
+            <div className="absolute inset-0 -z-10 bg-primary/10 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+          <div className="container mx-auto px-4 text-center md:px-6">
+            <div className="max-w-3xl mx-auto space-y-4">
+              <h1 className="text-4xl font-extrabold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+                Secure, Unlimited Cloud Storage
+              </h1>
+              <p className="text-lg text-foreground/80 md:text-xl">
+                Upload, store, and share any file type with ease. Your data is always safe and accessible, powered by Telegram's robust infrastructure.
+              </p>
+              <div>
+                <Button size="lg" asChild>
+                  <Link href="/login">Upload Your First File</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="features" className="py-12 md:py-24 lg:py-32 bg-secondary/50">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Why Choose DigiUnLim?</h2>
+              <p className="mx-auto max-w-2xl text-foreground/80 md:text-xl">
+                We provide a feature-rich experience for all your storage needs.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <div className="rounded-full bg-primary/10 p-3">
+                    <Cloud className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>Unlimited Storage</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Never worry about running out of space. Upload any file, any size, any time.</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <div className="rounded-full bg-primary/10 p-3">
+                    <FileLock className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>Telegram-Powered Security</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Leverage the world-class security and encryption of the Telegram network.</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <div className="rounded-full bg-primary/10 p-3">
+                    <Share2 className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>Easy File Sharing</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Generate secure, shareable links for your files and folders in just one click.</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+        <section id="pricing" className="py-12 md:py-24 lg:py-32">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Simple, Transparent Pricing</h2>
+              <p className="mx-auto max-w-2xl text-foreground/80 md:text-xl">
+                One plan to rule them all. Absolutely free.
+              </p>
+            </div>
+            <div className="mx-auto max-w-md">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-center">Free Forever</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center gap-4">
+                  <p className="text-5xl font-bold">
+                    $0<span className="text-lg font-normal text-foreground/80">/month</span>
+                  </p>
+                  <ul className="w-full space-y-2 text-foreground/90">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" /> Unlimited File Uploads
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" /> Unlimited Storage
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" /> Secure File Sharing
+                    </li>
+                     <li className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" /> Telegram Integration
+                    </li>
+                  </ul>
+                  <Button size="lg" className="w-full" asChild>
+                    <Link href="/login">Sign Up Now</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer id="contact" className="bg-secondary/50 py-6">
+        <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
+          <p className="text-sm text-foreground/80">&copy; 2024 DigiUnLim Cloud. All rights reserved.</p>
+          <div className="flex gap-4">
+             <Link href="#" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
+              Privacy
+            </Link>
+             <Link href="#" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
+              Terms
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }
