@@ -19,6 +19,7 @@ import {
   FileText,
   Archive,
   Settings,
+  Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -54,6 +55,7 @@ export default function DashboardPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [shareLink, setShareLink] = useState('');
@@ -165,6 +167,8 @@ export default function DashboardPage() {
     if (fileType.includes('zip') || fileType.includes('archive')) return <Archive className="h-8 w-8 text-primary" />;
     return <FileIcon className="h-8 w-8 text-primary" />;
   };
+  
+  const filteredFiles = files.filter(file => file.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className="flex min-h-screen flex-col bg-secondary/30">
@@ -233,7 +237,18 @@ export default function DashboardPage() {
           <p className="text-sm text-muted-foreground">Unlimited storage, any file type.</p>
         </div>
 
-        <h2 className="mb-4 text-2xl font-bold">Your Files</h2>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Your Files</h2>
+          <div className="relative w-full max-w-xs">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search files..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
 
         <div className="space-y-4">
           {files.filter(f => f.progress === 'uploading').map(file => (
@@ -250,6 +265,14 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {files.length > 0 && filteredFiles.length === 0 && searchTerm && (
+          <div className="mt-16 text-center">
+            <Search className="mx-auto h-16 w-16 text-muted-foreground" />
+            <p className="mt-4 text-lg font-medium">No files found</p>
+            <p className="text-muted-foreground">Your search for "{searchTerm}" did not match any files.</p>
+          </div>
+        )}
+
         {files.length === 0 && (
           <div className="mt-16 text-center">
             <FileIcon className="mx-auto h-16 w-16 text-muted-foreground" />
@@ -259,7 +282,7 @@ export default function DashboardPage() {
         )}
         
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {files.filter(f => f.progress === 'complete').map(file => (
+          {filteredFiles.filter(f => f.progress === 'complete').map(file => (
             <Card key={file.id} className="group relative">
               <CardContent className="flex flex-col items-center justify-center p-4 text-center">
                 <div className="mb-4">{getFileIcon(file.type)}</div>
@@ -333,3 +356,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
