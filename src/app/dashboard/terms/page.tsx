@@ -54,8 +54,7 @@ export default function TermsOfServicePage() {
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">6. Limitation of Liability</h2>
                     <p>In no event shall DigiUnLim Cloud, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.</p>
-                </e
-                section>
+                </section>
                  <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">7. Governing Law</h2>
                     <p>These Terms shall be governed and construed in accordance with the laws of the jurisdiction in which our company is established, without regard to its conflict of law provisions.</p>
