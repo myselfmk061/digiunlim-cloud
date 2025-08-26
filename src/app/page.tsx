@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Cloud, FileLock, Share2 } from 'lucide-react';
@@ -148,10 +149,10 @@ export default function Home() {
           <p className="text-sm text-foreground/80">&copy; 2024 DigiUnLim Cloud. All rights reserved.</p>
           <div className="flex gap-4">
              <Link href="/dashboard/privacy-policy" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
-              Privacy
+              Privacy Policy
             </Link>
-             <Link href="#" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
-              Terms
+             <Link href="/dashboard/terms" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
+              Terms of Service
             </Link>
           </div>
         </div>
