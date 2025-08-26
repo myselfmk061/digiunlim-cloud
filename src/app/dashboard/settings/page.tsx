@@ -209,7 +209,7 @@ export default function SettingsPage() {
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground" />
                 </Link>
-                <Link href="#" className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 px-2 rounded-md">
+                <Link href="/dashboard/privacy-policy" className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 px-2 rounded-md">
                     <div className="flex items-center gap-3">
                         <FileText className="h-5 w-5 text-muted-foreground"/>
                         <p>Privacy Policy</p>

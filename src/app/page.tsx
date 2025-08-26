@@ -147,7 +147,7 @@ export default function Home() {
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           <p className="text-sm text-foreground/80">&copy; 2024 DigiUnLim Cloud. All rights reserved.</p>
           <div className="flex gap-4">
-             <Link href="#" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
+             <Link href="/dashboard/privacy-policy" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
               Privacy
             </Link>
              <Link href="#" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
