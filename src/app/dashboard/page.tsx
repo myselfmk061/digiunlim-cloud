@@ -54,6 +54,7 @@ export default function DashboardPage() {
   const [files, setFiles] = useState<AppFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const profilePicInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,16 +63,36 @@ export default function DashboardPage() {
   const [shareLink, setShareLink] = useState('');
   const [fileToDelete, setFileToDelete] = useState<AppFile | null>(null);
   const [userPhoneNumber, setUserPhoneNumber] = useState<string | null>(null);
+  const [profilePic, setProfilePic] = useState<string | null>('https://picsum.photos/100/100');
 
   useEffect(() => {
     const storedPhoneNumber = localStorage.getItem('userPhoneNumber');
     if (storedPhoneNumber) {
       setUserPhoneNumber(storedPhoneNumber);
     }
+    const storedProfilePic = localStorage.getItem('profilePic');
+    if (storedProfilePic) {
+      setProfilePic(storedProfilePic);
+    }
   }, []);
+  
+  const handleProfilePicChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setProfilePic(dataUrl);
+        localStorage.setItem('profilePic', dataUrl);
+        toast({ title: 'Profile photo updated!' });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('userPhoneNumber');
+    localStorage.removeItem('profilePic');
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     router.push('/');
   };
@@ -173,6 +194,13 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-secondary/30">
+        <input
+            type="file"
+            ref={profilePicInputRef}
+            onChange={handleProfilePicChange}
+            className="hidden"
+            accept="image/*"
+        />
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 shadow-sm backdrop-blur md:px-6">
         <Link href="/dashboard" className="flex items-center gap-2" prefetch={false}>
           <Cloud className="h-6 w-6 text-primary" />
@@ -181,7 +209,7 @@ export default function DashboardPage() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="cursor-pointer">
-              <AvatarImage src="https://picsum.photos/100/100" alt="@user" />
+              <AvatarImage src={profilePic ?? undefined} alt="@user" />
               <AvatarFallback>
                 <User />
               </AvatarFallback>
@@ -190,6 +218,10 @@ export default function DashboardPage() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
+             <DropdownMenuItem onClick={() => profilePicInputRef.current?.click()}>
+              <Camera className="mr-2 h-4 w-4" />
+              Change Photo
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/dashboard/settings">
                 <Settings className="mr-2 h-4 w-4" />
@@ -353,3 +385,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
