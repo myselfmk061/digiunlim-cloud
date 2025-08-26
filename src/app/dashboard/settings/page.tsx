@@ -22,24 +22,46 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
     const [isStorageClaimed, setIsStorageClaimed] = useState(false);
     const [isClaiming, setIsClaiming] = useState(false);
+    const [isSpaceFreed, setIsSpaceFreed] = useState(false);
     const { toast } = useToast();
+
+    useEffect(() => {
+        const storedIsStorageClaimed = localStorage.getItem('isStorageClaimed');
+        if (storedIsStorageClaimed === 'true') {
+            setIsStorageClaimed(true);
+        }
+        const storedIsSpaceFreed = localStorage.getItem('isSpaceFreed');
+        if (storedIsSpaceFreed === 'true') {
+            setIsSpaceFreed(true);
+        }
+    }, []);
 
     const handleClaimStorage = () => {
         setIsClaiming(true);
         setTimeout(() => {
             setIsStorageClaimed(true);
+            localStorage.setItem('isStorageClaimed', 'true');
             setIsClaiming(false);
             toast({
                 title: 'Congratulations! 🎉',
                 description: 'You have claimed Unlimited Cloud Storage for free.',
             })
         }, 5000);
+    }
+    
+    const handleFreeUpSpace = () => {
+        setIsSpaceFreed(true);
+        localStorage.setItem('isSpaceFreed', 'true');
+        toast({
+            title: 'Action complete!',
+            description: 'The "Free up space" button has been hidden.',
+        });
     }
 
   return (
@@ -100,9 +122,11 @@ export default function SettingsPage() {
                 <CardContent className="text-center bg-green-500/10 p-6 rounded-lg">
                     <p className="text-2xl font-bold text-green-700">Congratulations! 🎉</p>
                     <p className="text-muted-foreground text-green-600">You have claimed Unlimited Cloud Storage.</p>
-                    <Button variant="outline" className="mt-4">
-                        <Trash2 className="mr-2 h-4 w-4" /> Free up space
-                    </Button>
+                    {!isSpaceFreed && (
+                        <Button variant="outline" className="mt-4" onClick={handleFreeUpSpace}>
+                            <Trash2 className="mr-2 h-4 w-4" /> Free up space
+                        </Button>
+                    )}
                 </CardContent>
              ) : (
                 <CardContent className="flex flex-col items-center justify-center gap-4 text-center p-6">
