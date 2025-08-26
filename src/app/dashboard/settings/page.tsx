@@ -15,13 +15,27 @@ import {
   Trash2,
   Bell,
   HardDrive,
+  Gift,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
+    const [isStorageClaimed, setIsStorageClaimed] = useState(false);
+    const { toast } = useToast();
+
+    const handleClaimStorage = () => {
+        setIsStorageClaimed(true);
+        toast({
+            title: 'Congratulations! 🎉',
+            description: 'You have claimed Unlimited Cloud Storage for free.',
+        })
+    }
+
   return (
     <div className="flex min-h-screen flex-col bg-secondary/30">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 shadow-sm backdrop-blur md:px-6">
@@ -76,13 +90,24 @@ export default function SettingsPage() {
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center bg-green-500/10 p-6 rounded-lg">
-              <p className="text-2xl font-bold text-green-700">Congratulations! 🎉</p>
-              <p className="text-muted-foreground text-green-600">You have claimed Unlimited Cloud Storage.</p>
-              <Button variant="outline" className="mt-4">
-                  <Trash2 className="mr-2 h-4 w-4" /> Free up space
-              </Button>
-            </CardContent>
+             {isStorageClaimed ? (
+                <CardContent className="text-center bg-green-500/10 p-6 rounded-lg">
+                    <p className="text-2xl font-bold text-green-700">Congratulations! 🎉</p>
+                    <p className="text-muted-foreground text-green-600">You have claimed Unlimited Cloud Storage.</p>
+                    <Button variant="outline" className="mt-4">
+                        <Trash2 className="mr-2 h-4 w-4" /> Free up space
+                    </Button>
+                </CardContent>
+             ) : (
+                <CardContent className="flex flex-col items-center justify-center gap-4 text-center p-6">
+                    <Gift className="h-12 w-12 text-primary"/>
+                    <p className="font-semibold">You have a special gift!</p>
+                    <p className="text-muted-foreground">Claim your free unlimited cloud storage now.</p>
+                    <Button onClick={handleClaimStorage}>
+                        <Gift className="mr-2 h-4 w-4" /> Claim Now
+                    </Button>
+                </CardContent>
+             )}
           </Card>
 
           {/* Search Optimization */}
