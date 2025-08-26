@@ -171,7 +171,7 @@ export default function DashboardPage() {
   };
   
   const handleShare = (file: AppFile) => {
-    const link = `https://cloud.store/share/${file.id}/${encodeURIComponent(file.name)}`;
+    const link = `https://digiunlim.cloud/share/${file.id}/${encodeURIComponent(file.name)}`;
     setShareLink(link);
     setDialogOpen(true);
   };
@@ -204,7 +204,7 @@ export default function DashboardPage() {
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 shadow-sm backdrop-blur md:px-6">
         <Link href="/dashboard" className="flex items-center gap-2" prefetch={false}>
           <Cloud className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">Cloud Store</span>
+          <span className="text-lg font-bold">DigiUnLim Cloud</span>
         </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

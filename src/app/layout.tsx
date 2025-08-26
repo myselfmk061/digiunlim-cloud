@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Cloud Store - Unlimited Cloud Storage',
+  title: 'DigiUnLim Cloud - Unlimited Cloud Storage',
   description: 'Your secure and unlimited cloud storage solution.',
 };
 

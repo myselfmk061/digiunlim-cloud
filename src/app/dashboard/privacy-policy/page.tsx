@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage() {
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 shadow-sm backdrop-blur md:px-6">
         <Link href="/dashboard" className="flex items-center gap-2" prefetch={false}>
           <Cloud className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">Cloud Store</span>
+          <span className="text-lg font-bold">DigiUnLim Cloud</span>
         </Link>
       </header>
 
@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-6 w-6" /> Privacy Policy for Cloud Store
+                    <FileText className="h-6 w-6" /> Privacy Policy for DigiUnLim Cloud
                 </CardTitle>
                 <CardDescription>
                     Your privacy is important to us.
@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
             <CardContent className="space-y-6 text-muted-foreground">
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">1. Introduction</h2>
-                    <p>Welcome to Cloud Store. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your personal information, please contact us at support@cloud.store.</p>
+                    <p>Welcome to DigiUnLim Cloud. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your personal information, please contact us at support@digiunlim.cloud.</p>
                 </section>
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">2. Information We Collect</h2>
@@ -77,7 +77,7 @@ export default function PrivacyPolicyPage() {
                 </section>
                  <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">8. Contact Us</h2>
-                    <p>If you have questions or comments about this notice, you may email us at <a href="mailto:support@cloud.store" className="text-primary underline">support@cloud.store</a>.</p>
+                    <p>If you have questions or comments about this notice, you may email us at <a href="mailto:support@digiunlim.cloud" className="text-primary underline">support@digiunlim.cloud</a>.</p>
                 </section>
             </CardContent>
         </Card>

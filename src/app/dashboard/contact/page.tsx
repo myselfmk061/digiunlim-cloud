@@ -59,7 +59,7 @@ export default function ContactPage() {
     const subject = encodeURIComponent(`Contact Form Submission from ${data.name}`);
     const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`);
     
-    window.location.href = `mailto:support@cloud.store?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:support@digiunlim.cloud?subject=${subject}&body=${body}`;
 
     setIsSending(false);
 
@@ -74,7 +74,7 @@ export default function ContactPage() {
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 shadow-sm backdrop-blur md:px-6">
         <Link href="/dashboard" className="flex items-center gap-2" prefetch={false}>
           <Cloud className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">Cloud Store</span>
+          <span className="text-lg font-bold">DigiUnLim Cloud</span>
         </Link>
       </header>
       <main className="container mx-auto flex-1 p-4 md:p-6 lg:p-8">

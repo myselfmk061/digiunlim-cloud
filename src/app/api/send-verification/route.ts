@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
     const verificationToken = Math.random().toString(36).substring(2, 15);
     const verificationLink = `${appUrl}/dashboard?token=${verificationToken}`;
-    const message = `Hello! Click this link to log in to Cloud Store: ${verificationLink}`;
+    const message = `Hello! Click this link to log in to DigiUnLim Cloud: ${verificationLink}`;
     
     // IMPORTANT: For this to work, the `chatId` must be correct.
     // In a real application, you would look up the user's chatId based on their phone number from a database.

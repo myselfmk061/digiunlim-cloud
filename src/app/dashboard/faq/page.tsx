@@ -12,8 +12,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 const faqItems = [
     {
-        question: "What is Cloud Store?",
-        answer: "Cloud Store is a secure, unlimited cloud storage solution that allows you to upload, store, and share any file type with ease. It's powered by Telegram's robust infrastructure to ensure your data is always safe and accessible."
+        question: "What is DigiUnLim Cloud?",
+        answer: "DigiUnLim Cloud is a secure, unlimited cloud storage solution that allows you to upload, store, and share any file type with ease. It's powered by Telegram's robust infrastructure to ensure your data is always safe and accessible."
     },
     {
         question: "Is the storage really unlimited?",
@@ -25,10 +25,10 @@ const faqItems = [
     },
     {
         question: "How do I share files?",
-        answer: "You can easily generate secure, shareable links for your files and folders in just one click from your dashboard. You can share these links with anyone, even if they don't have a Cloud Store account."
+        answer: "You can easily generate secure, shareable links for your files and folders in just one click from your dashboard. You can share these links with anyone, even if they don't have a DigiUnLim Cloud account."
     },
     {
-        question: "Is Cloud Store really free?",
+        question: "Is DigiUnLim Cloud really free?",
         answer: "Yes, our core service is completely free. We offer a 'Free Forever' plan that includes unlimited storage and all essential features. We believe everyone should have access to reliable cloud storage."
     },
     {
@@ -43,7 +43,7 @@ export default function FAQPage() {
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 shadow-sm backdrop-blur md:px-6">
         <Link href="/dashboard" className="flex items-center gap-2" prefetch={false}>
           <Cloud className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">Cloud Store</span>
+          <span className="text-lg font-bold">DigiUnLim Cloud</span>
         </Link>
       </header>
 
@@ -59,7 +59,7 @@ export default function FAQPage() {
                     <HelpCircle className="h-6 w-6" /> General Questions
                 </CardTitle>
                 <CardDescription>
-                    Information about the Cloud Store platform.
+                    Information about the DigiUnLim Cloud platform.
                 </CardDescription>
             </CardHeader>
             <CardContent>
