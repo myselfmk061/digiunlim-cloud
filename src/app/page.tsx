@@ -10,7 +10,7 @@ export default function Home() {
       <header className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="#" className="flex items-center gap-2" prefetch={false}>
           <Cloud className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">DigiUnLim Cloud</span>
+          <span className="text-lg font-bold">Cloud Store</span>
         </Link>
         <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
           <Link
@@ -61,7 +61,7 @@ export default function Home() {
         <section id="features" className="py-12 md:py-24 lg:py-32 bg-secondary/50">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mb-12 text-center">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Why Choose DigiUnLim?</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Why Choose Cloud Store?</h2>
               <p className="mx-auto max-w-2xl text-foreground/80 md:text-xl">
                 We provide a feature-rich experience for all your storage needs.
               </p>
@@ -145,7 +145,7 @@ export default function Home() {
       </main>
       <footer id="contact" className="bg-secondary/50 py-6">
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
-          <p className="text-sm text-foreground/80">&copy; 2024 DigiUnLim Cloud. All rights reserved.</p>
+          <p className="text-sm text-foreground/80">&copy; 2024 Cloud Store. All rights reserved.</p>
           <div className="flex gap-4">
              <Link href="/dashboard/privacy-policy" className="text-foreground/80 transition-colors hover:text-foreground" prefetch={false}>
               Privacy
