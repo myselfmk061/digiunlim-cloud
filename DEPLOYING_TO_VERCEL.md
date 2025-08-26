@@ -1,0 +1,66 @@
+# How to Deploy Your Project to Vercel (Step-by-Step)
+
+Follow these steps carefully to get your website live on the internet.
+
+## Before You Start
+
+Make sure your code is on GitHub. If you haven't done this, please ask me "How do I put my project on GitHub?" and I will guide you.
+
+---
+
+### Step 1: Go to Vercel and Import Project
+
+1.  Open your web browser and go to [https://vercel.com/new](https://vercel.com/new).
+2.  If you are not logged in, sign up using your GitHub account.
+3.  You will see a list of your GitHub projects. Find your project (e.g., `cloud-store-app`) and click the **Import** button.
+
+![Step 1: Import Project on Vercel](https://storage.googleapis.com/studioprod- βοηθός.appspot.com/assets/vercel_import.png)
+
+---
+
+### Step 2: Configure Your Project
+
+Vercel will automatically know it's a Next.js project. You just need to add your secrets.
+
+1.  Scroll down until you see the section called **Environment Variables**.
+2.  You will add two secrets here, one by one.
+
+    **First Secret:**
+    *   In the **Name** box, type `TELEGRAM_BOT_TOKEN`
+    *   In the **Value** box, paste your token: `8485783789:AAHNm4cHNMfwncpDbtQ_ktBZoJuvwojTLK0`
+    *   Click the **Add** button.
+
+    **Second Secret:**
+    *   In the **Name** box, type `TELEGRAM_CHAT_ID`
+    *   In the **Value** box, paste your Chat ID: `-1003081182923`
+    *   Click the **Add** button.
+
+It should look like this:
+
+![Step 2: Add Environment Variables](https://storage.googleapis.com/studioprod- βοηθός.appspot.com/assets/vercel_env_vars.png)
+
+---
+
+### Step 3: Deploy
+
+1.  Now, just click the big blue **Deploy** button.
+2.  Wait for a minute or two while Vercel builds and deploys your site.
+
+![Step 3: Deploy](https://storage.googleapis.com/studioprod- βοηθός.appspot.com/assets/vercel_deploy.png)
+
+---
+
+### Step 4: Final Update (Very Important!)
+
+After deploying, Vercel will show you a congratulations screen with a picture of your new website.
+
+1.  At the top, you will see your public URL (e.g., `your-project.vercel.app`). **Copy this URL.**
+2.  Go back to your Vercel project dashboard.
+3.  Go to the **Settings** tab.
+4.  Click on **Environment Variables** in the left menu.
+5.  Add one more variable:
+    *   **Name:** `NEXT_PUBLIC_APP_URL`
+    *   **Value:** Paste the URL you copied.
+6.  **Save** the new variable. Vercel will automatically start a new deployment.
+
+You are all done! Your website is now live and fully configured.
