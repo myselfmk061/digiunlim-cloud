@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -61,26 +62,43 @@ export function LoginForm() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setIsLoading(true);
 
-    // Simulate API call to send verification link
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    // In a real app, you would handle the response and wait for Telegram verification.
-    // For this demo, we'll simulate a successful verification and redirect.
+    try {
+        const response = await fetch('/api/send-verification', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
 
-    toast({
-      title: 'Verification Link Sent',
-      description: `A login link has been sent to your Telegram account associated with ${data.countryCode} ${data.phoneNumber}. Please verify to continue.`,
-    });
-    
-    // Simulate user verifying and being redirected
-    setTimeout(() => {
+        if (!response.ok) {
+            throw new Error('Failed to send verification link.');
+        }
+
+        toast({
+            title: 'Verification Link Sent',
+            description: `A login link has been sent to your Telegram account associated with ${data.countryCode} ${data.phoneNumber}. Please verify to continue.`,
+        });
+        
         // Save user info to localStorage
         const fullPhoneNumber = `${data.countryCode} ${data.phoneNumber}`;
         localStorage.setItem('userPhoneNumber', fullPhoneNumber);
 
+        // For the demo, we'll redirect after a short delay to simulate the user clicking the link.
+        setTimeout(() => {
+            setIsLoading(false);
+            router.push('/dashboard');
+        }, 1500);
+
+    } catch (error) {
+        console.error(error);
+        toast({
+            title: 'Error',
+            description: 'Could not send verification link. Please try again later.',
+            variant: 'destructive',
+        });
         setIsLoading(false);
-        router.push('/dashboard');
-    }, 1500)
+    }
   }
 
   return (
