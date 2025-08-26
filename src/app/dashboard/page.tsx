@@ -20,6 +20,7 @@ import {
   Archive,
   Settings,
   Search,
+  Camera,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -53,6 +54,7 @@ export default function DashboardPage() {
   const [files, setFiles] = useState<AppFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const profilePicInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,16 +63,22 @@ export default function DashboardPage() {
   const [shareLink, setShareLink] = useState('');
   const [fileToDelete, setFileToDelete] = useState<AppFile | null>(null);
   const [userPhoneNumber, setUserPhoneNumber] = useState<string | null>(null);
+  const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const storedPhoneNumber = localStorage.getItem('userPhoneNumber');
     if (storedPhoneNumber) {
       setUserPhoneNumber(storedPhoneNumber);
     }
+    const storedProfilePic = localStorage.getItem('profilePicUrl');
+    if (storedProfilePic) {
+      setProfilePicUrl(storedProfilePic);
+    }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('userPhoneNumber');
+    localStorage.removeItem('profilePicUrl');
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     router.push('/');
   };
@@ -78,6 +86,23 @@ export default function DashboardPage() {
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       uploadFiles(Array.from(event.target.files));
+    }
+  };
+  
+  const handleProfilePicSelect = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        localStorage.setItem('profilePicUrl', dataUrl);
+        setProfilePicUrl(dataUrl);
+        toast({
+          title: 'Profile Photo Updated',
+          description: 'Your new profile photo has been saved.',
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -172,6 +197,13 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-secondary/30">
+      <input
+        type="file"
+        ref={profilePicInputRef}
+        onChange={handleProfilePicSelect}
+        className="hidden"
+        accept="image/*"
+      />
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 shadow-sm backdrop-blur md:px-6">
         <Link href="/dashboard" className="flex items-center gap-2" prefetch={false}>
           <Cloud className="h-6 w-6 text-primary" />
@@ -180,7 +212,7 @@ export default function DashboardPage() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="cursor-pointer">
-              <AvatarImage src="https://picsum.photos/100/100" alt="@user" />
+              <AvatarImage src={profilePicUrl || "https://picsum.photos/100/100"} alt="@user" />
               <AvatarFallback>
                 <User />
               </AvatarFallback>
@@ -189,9 +221,9 @@ export default function DashboardPage() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                Profile
+            <DropdownMenuItem onSelect={() => profilePicInputRef.current?.click()}>
+                <Camera className="mr-2 h-4 w-4" />
+                Change Photo
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/dashboard/settings">
@@ -356,5 +388,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
