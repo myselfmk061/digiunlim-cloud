@@ -41,8 +41,10 @@ export default function SettingsPage() {
           {/* Synchronization */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <RefreshCw className="h-5 w-5" /> Synchronization
+              <CardTitle>
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="h-5 w-5" /> <span>Synchronization</span>
+                </div>
               </CardTitle>
               <CardDescription>Settings and preferences</CardDescription>
             </CardHeader>
@@ -68,8 +70,10 @@ export default function SettingsPage() {
           {/* Data and Storage */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" /> Data and Storage
+              <CardTitle>
+                <div className="flex items-center gap-2">
+                    <Database className="h-5 w-5" /> <span>Data and Storage</span>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center bg-green-500/10 p-6 rounded-lg">
@@ -84,9 +88,11 @@ export default function SettingsPage() {
           {/* Search Optimization */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="h-5 w-5" /> Search Optimization
-              </CardTitle>
+                <CardTitle>
+                    <div className="flex items-center gap-2">
+                        <Search className="h-5 w-5" /> <span>Search Optimization</span>
+                    </div>
+                </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
@@ -102,9 +108,11 @@ export default function SettingsPage() {
           {/* Mobile Version */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HardDrive className="h-5 w-5" /> Desktop Version
-              </CardTitle>
+                <CardTitle>
+                    <div className="flex items-center gap-2">
+                        <HardDrive className="h-5 w-5" /> <span>Desktop Version</span>
+                    </div>
+                </CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-between">
                 <p>Access your files on the go with our mobile app.</p>
@@ -119,9 +127,11 @@ export default function SettingsPage() {
           {/* About */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Info className="h-5 w-5" /> About
-              </CardTitle>
+                <CardTitle>
+                    <div className="flex items-center gap-2">
+                        <Info className="h-5 w-5" /> <span>About</span>
+                    </div>
+                </CardTitle>
             </CardHeader>
             <CardContent className="divide-y">
                 <Link href="#" className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 px-2 rounded-md">
