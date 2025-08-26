@@ -6,4 +6,5 @@ export interface AppFile {
   uploadDate: Date;
   url: string;
   progress: 'uploading' | 'complete';
+  telegramMessageId?: number; // Message ID from telegram for deletion
 }

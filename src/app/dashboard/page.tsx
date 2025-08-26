@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
@@ -22,6 +23,7 @@ import {
   Search,
   Camera,
   CheckCircle,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -68,6 +70,7 @@ export default function DashboardPage() {
   const [profilePic, setProfilePic] = useState<string | null>('https://picsum.photos/100/100');
   const [isVerified, setIsVerified] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -75,18 +78,14 @@ export default function DashboardPage() {
 
     if (token && storedPhoneNumber) {
         setShowVerificationMessage(true);
-        // Simulate verification and show dashboard after a delay
         setTimeout(() => {
             setIsVerified(true);
             setShowVerificationMessage(false);
-            // Clean the URL
             router.replace('/dashboard', undefined);
         }, 2500);
     } else if (storedPhoneNumber) {
-        // If user is already "logged in" (has phone number) but no token, show dashboard
         setIsVerified(true);
     } else {
-        // If no phone number, redirect to login
         router.push('/login');
     }
 
@@ -97,7 +96,18 @@ export default function DashboardPage() {
     if (storedProfilePic) {
       setProfilePic(storedProfilePic);
     }
+    const storedFiles = localStorage.getItem('userFiles');
+    if (storedFiles) {
+        setFiles(JSON.parse(storedFiles));
+    }
   }, [searchParams, router]);
+
+  useEffect(() => {
+    // Persist files to localStorage whenever they change
+    if (files.length > 0 || localStorage.getItem('userFiles')) {
+        localStorage.setItem('userFiles', JSON.stringify(files));
+    }
+  }, [files]);
   
   const handleProfilePicChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -116,6 +126,7 @@ export default function DashboardPage() {
   const handleLogout = () => {
     localStorage.removeItem('userPhoneNumber');
     localStorage.removeItem('profilePic');
+    localStorage.removeItem('userFiles');
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     router.push('/');
   };
@@ -126,32 +137,54 @@ export default function DashboardPage() {
     }
   };
   
-  const uploadFiles = (fileList: File[]) => {
-    fileList.forEach((file) => {
-      const newFile: AppFile = {
-        id: `file-${Date.now()}-${Math.random()}`,
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        uploadDate: new Date(),
-        url: '#',
-        progress: 'uploading',
-      };
+  const uploadFiles = async (fileList: File[]) => {
+    setIsUploading(true);
+    for (const file of fileList) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      setFiles((prev) => [newFile, ...prev]);
+        const tempId = `temp-${Date.now()}`;
+        const tempFile: AppFile = {
+            id: tempId,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            uploadDate: new Date(),
+            url: '#',
+            progress: 'uploading'
+        };
+        setFiles(prev => [tempFile, ...prev]);
 
-      // Simulate upload
-      setTimeout(() => {
-        setFiles((prev) =>
-          prev.map((f) => (f.id === newFile.id ? { ...f, progress: 'complete' } : f))
-        );
-        toast({
-          title: 'Upload Complete',
-          description: `"${newFile.name}" has been successfully uploaded.`,
-        });
-      }, 2000 + Math.random() * 3000);
-    });
+        try {
+            const response = await fetch('/api/telegram', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Upload failed');
+            }
+
+            const newFile = await response.json();
+            setFiles(prev => prev.map(f => f.id === tempId ? newFile : f));
+            toast({
+                title: 'Upload Complete',
+                description: `"${newFile.name}" has been successfully uploaded.`,
+            });
+        } catch (error) {
+            console.error('Upload error:', error);
+            setFiles(prev => prev.filter(f => f.id !== tempId)); // Remove temp file on error
+            toast({
+                title: 'Upload Failed',
+                description: error instanceof Error ? error.message : `Could not upload "${file.name}".`,
+                variant: 'destructive',
+            });
+        }
+    }
+    setIsUploading(false);
   };
+
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -181,20 +214,41 @@ export default function DashboardPage() {
     setFileToDelete(file);
   };
 
-  const confirmDelete = () => {
-    if (fileToDelete) {
-      setFiles((prev) => prev.filter((f) => f.id !== fileToDelete.id));
-      toast({
-        title: 'File Deleted',
-        description: `"${fileToDelete.name}" has been permanently deleted.`,
-        variant: 'destructive',
-      });
-      setFileToDelete(null);
+  const confirmDelete = async () => {
+    if (!fileToDelete) return;
+
+    try {
+        const response = await fetch(`/api/telegram?messageId=${fileToDelete.telegramMessageId}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to delete file.');
+        }
+
+        setFiles((prev) => prev.filter((f) => f.id !== fileToDelete!.id));
+        toast({
+            title: 'File Deleted',
+            description: `"${fileToDelete!.name}" has been permanently deleted.`,
+            variant: 'destructive',
+        });
+    } catch (error) {
+        toast({
+            title: 'Error',
+            description: `Could not delete file. It might have been deleted already.`,
+            variant: 'destructive',
+        });
+        // Optionally remove from UI even if Telegram deletion fails
+        setFiles((prev) => prev.filter((f) => f.id !== fileToDelete!.id));
+    } finally {
+        setFileToDelete(null);
     }
   };
   
   const handleShare = (file: AppFile) => {
-    const link = `https://digiunlim.cloud/share/${file.id}/${encodeURIComponent(file.name)}`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+    const link = `${appUrl}/share/${file.id}/${encodeURIComponent(file.name)}`;
     setShareLink(link);
     setDialogOpen(true);
   };
@@ -203,13 +257,18 @@ export default function DashboardPage() {
     navigator.clipboard.writeText(shareLink);
     toast({ title: 'Copied to clipboard!', description: 'Share link has been copied.' });
   };
+  
+  const handleDownload = (file: AppFile) => {
+    // The link will open in a new tab, and the browser will handle the download.
+    window.open(`/api/telegram?fileId=${file.id}`, '_blank');
+  };
 
   const getFileIcon = (fileType: string) => {
     if (fileType.startsWith('image/')) return <FileImage className="h-8 w-8 text-primary" />;
     if (fileType.startsWith('video/')) return <FileVideo className="h-8 w-8 text-primary" />;
     if (fileType.startsWith('audio/')) return <FileAudio className="h-8 w-8 text-primary" />;
     if (fileType.startsWith('text/')) return <FileText className="h-8 w-8 text-primary" />;
-    if (fileType.includes('zip') || fileType.includes('archive')) return <Archive className="h-8 w-8 text-primary" />;
+    if (fileType.includes('zip') || fileType.includes('archive') || fileType.includes('rar')) return <Archive className="h-8 w-8 text-primary" />;
     return <FileIcon className="h-8 w-8 text-primary" />;
   };
   
@@ -230,10 +289,10 @@ export default function DashboardPage() {
   }
 
   if (!isVerified) {
-    // You can show a loading spinner here while verifying
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-            <p>Loading...</p>
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="mt-4">Verifying...</p>
         </div>
     );
   }
@@ -305,12 +364,25 @@ export default function DashboardPage() {
             onChange={handleFileSelect}
             className="hidden"
             multiple
+            disabled={isUploading}
           />
-          <UploadCloud className="mx-auto h-12 w-12 text-primary" />
-          <p className="mt-4 font-semibold text-foreground">
-            Drag & drop files here, or click to select files
-          </p>
-          <p className="text-sm text-muted-foreground">Unlimited storage, any file type.</p>
+          { isUploading ? (
+            <>
+                <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+                <p className="mt-4 font-semibold text-foreground">
+                    Uploading files... Please wait.
+                </p>
+                <p className="text-sm text-muted-foreground">Your dashboard will update automatically.</p>
+            </>
+          ) : (
+            <>
+                <UploadCloud className="mx-auto h-12 w-12 text-primary" />
+                <p className="mt-4 font-semibold text-foreground">
+                    Drag & drop files here, or click to select files
+                </p>
+                <p className="text-sm text-muted-foreground">Unlimited storage, any file type.</p>
+            </>
+          )}
         </div>
 
         <div className="mb-6 flex items-center justify-between">
@@ -328,7 +400,7 @@ export default function DashboardPage() {
 
         <div className="space-y-4">
           {files.filter(f => f.progress === 'uploading').map(file => (
-            <Card key={file.id} className="overflow-hidden">
+            <Card key={file.id} className="overflow-hidden animate-pulse">
               <CardContent className="flex items-center gap-4 p-4">
                 <div className="flex-shrink-0">{getFileIcon(file.type)}</div>
                 <div className="flex-1 overflow-hidden">
@@ -341,7 +413,7 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {files.length > 0 && filteredFiles.length === 0 && searchTerm && (
+        {filteredFiles.length === 0 && searchTerm && (
           <div className="mt-16 text-center">
             <Search className="mx-auto h-16 w-16 text-muted-foreground" />
             <p className="mt-4 text-lg font-medium">No files found</p>
@@ -349,7 +421,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {files.length === 0 && (
+        {files.length === 0 && !isUploading && (
           <div className="mt-16 text-center">
             <FileIcon className="mx-auto h-16 w-16 text-muted-foreground" />
             <p className="mt-4 text-lg font-medium">No files uploaded yet</p>
@@ -377,10 +449,8 @@ export default function DashboardPage() {
                     <DropdownMenuItem onClick={() => handleShare(file)}>
                       <Share2 className="mr-2 h-4 w-4" /> Share Link
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <a href={file.url} download={file.name}>
-                            <Download className="mr-2 h-4 w-4" /> Download
-                        </a>
+                    <DropdownMenuItem onClick={() => handleDownload(file)}>
+                        <Download className="mr-2 h-4 w-4" /> Download
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => handleDelete(file)} className="text-red-500 focus:text-red-400">
@@ -399,7 +469,7 @@ export default function DashboardPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete "{fileToDelete?.name}" and remove your data from our servers.
+              This action cannot be undone. This will permanently delete "{fileToDelete?.name}" from your storage.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -415,7 +485,7 @@ export default function DashboardPage() {
             <DialogHeader>
                 <DialogTitle>Share File</DialogTitle>
                 <DialogDescription>
-                    Anyone with this link can view and download the file.
+                    Anyone with this link can view and download the file. This link is not secure.
                 </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
