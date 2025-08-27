@@ -94,22 +94,22 @@ export function LoginForm() {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to send verification link.');
+            const errorResult = await response.json();
+            throw new Error(errorResult.error || 'Failed to send verification link.');
         }
 
         const fullPhoneNumber = `${data.countryCode} ${data.phoneNumber}`;
         localStorage.setItem('userPhoneNumber', fullPhoneNumber);
         
-        // This query param will be used to show a "success" message on the dashboard one time.
-        router.push('/dashboard?verified=true');
-        
         setIsLinkSent(true);
-
+        // This will now only happen after the link is successfully sent.
+        // We no longer redirect automatically, the user must click the link.
+        
     } catch (error) {
         console.error(error);
         toast({
             title: 'Error',
-            description: 'Could not send verification link. Please try again later.',
+            description: error instanceof Error ? error.message : 'Could not send verification link. Please try again later.',
             variant: 'destructive',
         });
     } finally {
@@ -126,7 +126,7 @@ export function LoginForm() {
                   </div>
                   <CardTitle className="text-2xl font-bold">Check your Telegram</CardTitle>
                   <CardDescription>
-                      A secure login link has been sent to your account. Please click the link to continue.
+                      A secure login link has been sent to your account. Please click the link to continue to your dashboard.
                   </CardDescription>
               </CardHeader>
               <CardContent>
