@@ -34,7 +34,7 @@ export default function PrivacyPolicyPage() {
             <CardContent className="space-y-6 text-muted-foreground">
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">1. Introduction</h2>
-                    <p>Welcome to DigiUnLim Cloud. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your personal information, please contact us at support@digiunlim.cloud.</p>
+                    <p>Welcome to DigiUnLim Cloud. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your personal information, please contact us at myselfmkapps@gmail.com.</p>
                 </section>
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">2. Information We Collect</h2>
@@ -78,7 +78,7 @@ export default function PrivacyPolicyPage() {
                 </section>
                  <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">8. Contact Us</h2>
-                    <p>If you have questions or comments about this notice, you may email us at <a href="mailto:support@digiunlim.cloud" className="text-primary underline">support@digiunlim.cloud</a>.</p>
+                    <p>If you have questions or comments about this notice, you may email us at <a href="mailto:myselfmkapps@gmail.com" className="text-primary underline">myselfmkapps@gmail.com</a>.</p>
                 </section>
             </CardContent>
         </Card>
