@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     
     const botToken = process.env.VERIFICATION_BOT_TOKEN;
     const chatId = process.env.VERIFICATION_CHAT_ID;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002';
 
     if (!botToken || !chatId) {
       console.error('VERIFICATION_BOT_TOKEN or VERIFICATION_CHAT_ID is not set.');

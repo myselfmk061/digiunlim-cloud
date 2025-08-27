@@ -65,6 +65,7 @@ function DashboardLoading() {
 
 function DashboardContent() {
   const [files, setFiles] = useState<AppFile[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profilePicInputRef = useRef<HTMLInputElement>(null);
@@ -226,6 +227,78 @@ function DashboardContent() {
       uploadFiles(Array.from(e.dataTransfer.files));
       e.dataTransfer.clearData();
     }
+  };
+
+  const handleFileSelect = (fileId: string) => {
+    setSelectedFiles(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(fileId)) {
+        newSet.delete(fileId);
+      } else {
+        newSet.add(fileId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    const completedFiles = filteredFiles.filter(f => f.progress === 'complete');
+    if (selectedFiles.size === completedFiles.length) {
+      setSelectedFiles(new Set());
+    } else {
+      setSelectedFiles(new Set(completedFiles.map(f => f.id)));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    const filesToDelete = files.filter(f => selectedFiles.has(f.id));
+    if (filesToDelete.length === 1) {
+      setFileToDelete(filesToDelete[0]);
+    } else {
+      // For multiple files, we'll handle bulk delete
+      confirmBulkDelete(filesToDelete);
+    }
+  };
+
+  const confirmBulkDelete = async (filesToDelete: AppFile[]) => {
+    try {
+      for (const file of filesToDelete) {
+        await fetch(`/api/telegram?messageId=${file.telegramMessageId}`, {
+          method: 'DELETE',
+        });
+      }
+      setFiles(prev => prev.filter(f => !selectedFiles.has(f.id)));
+      setSelectedFiles(new Set());
+      toast({
+        title: 'Files Deleted',
+        description: `${filesToDelete.length} files have been deleted.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Some files could not be deleted.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleBulkDownload = () => {
+    selectedFiles.forEach(fileId => {
+      const file = files.find(f => f.id === fileId);
+      if (file) {
+        window.open(`/api/telegram?fileId=${file.id}`, '_blank');
+      }
+    });
+  };
+
+  const handleBulkShare = () => {
+    const selectedFilesList = files.filter(f => selectedFiles.has(f.id));
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+    const links = selectedFilesList.map(file => 
+      `${appUrl}/share/${file.id}/${encodeURIComponent(file.name)}`
+    ).join('\n');
+    setShareLink(links);
+    setDialogOpen(true);
   };
 
   const handleDelete = (file: AppFile) => {
@@ -398,7 +471,18 @@ function DashboardContent() {
         </div>
 
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Your Files</h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-2xl font-bold">Your Files</h2>
+            {filteredFiles.filter(f => f.progress === 'complete').length > 0 && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSelectAll}
+              >
+                {selectedFiles.size === filteredFiles.filter(f => f.progress === 'complete').length ? 'Deselect All' : 'Select All'}
+              </Button>
+            )}
+          </div>
           <div className="relative w-full max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -409,6 +493,23 @@ function DashboardContent() {
             />
           </div>
         </div>
+
+        {selectedFiles.size > 0 && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg bg-primary/10 p-4">
+            <span className="text-sm font-medium">{selectedFiles.size} files selected</span>
+            <div className="ml-auto flex gap-2">
+              <Button size="sm" variant="outline" onClick={handleBulkShare}>
+                <Share2 className="mr-2 h-4 w-4" /> Share
+              </Button>
+              <Button size="sm" variant="outline" onClick={handleBulkDownload}>
+                <Download className="mr-2 h-4 w-4" /> Download
+              </Button>
+              <Button size="sm" variant="destructive" onClick={handleBulkDelete}>
+                <Trash2 className="mr-2 h-4 w-4" /> Delete
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-4">
           {files.filter(f => f.progress === 'uploading').map(file => (
@@ -443,29 +544,43 @@ function DashboardContent() {
         
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {filteredFiles.filter(f => f.progress === 'complete').map(file => (
-            <Card key={file.id} className="group relative">
+            <Card 
+              key={file.id} 
+              className={`group relative cursor-pointer transition-all ${
+                selectedFiles.has(file.id) ? 'ring-2 ring-primary bg-primary/5' : 'hover:shadow-md'
+              }`}
+              onClick={() => handleFileSelect(file.id)}
+            >
               <CardContent className="flex flex-col items-center justify-center p-4 text-center">
                 <div className="mb-4">{getFileIcon(file.type)}</div>
                 <p className="w-full truncate font-medium">{file.name}</p>
                 <p className="text-xs text-muted-foreground">
                     {(file.size / (1024 * 1024)).toFixed(2)} MB
                 </p>
+                {selectedFiles.has(file.id) && (
+                  <CheckCircle className="absolute right-2 top-2 h-5 w-5 text-primary" />
+                )}
               </CardContent>
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="absolute right-1 top-1 h-8 w-8 opacity-0 group-hover:opacity-100">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute right-1 top-1 h-8 w-8 opacity-0 group-hover:opacity-100"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleShare(file)}>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleShare(file); }}>
                       <Share2 className="mr-2 h-4 w-4" /> Share Link
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDownload(file)}>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDownload(file); }}>
                         <Download className="mr-2 h-4 w-4" /> Download
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => handleDelete(file)} className="text-red-500 focus:text-red-400">
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDelete(file); }} className="text-red-500 focus:text-red-400">
                       <Trash2 className="mr-2 h-4 w-4" /> Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>

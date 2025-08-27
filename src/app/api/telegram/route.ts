@@ -7,8 +7,8 @@ import type { AppFile } from '@/types';
 function getBotToken() {
     const token = process.env.STORAGE_BOT_TOKEN;
     if (!token) {
-        console.error('STORAGE_BOT_TOKEN is not set in .env file.');
-        throw new Error('Telegram storage bot is not configured.');
+        console.error('STORAGE_BOT_TOKEN is not set.');
+        throw new Error('Storage service is not configured. Please contact support.');
     }
     return token;
 }
@@ -16,8 +16,8 @@ function getBotToken() {
 function getChatId() {
     const chatId = process.env.STORAGE_CHAT_ID;
     if (!chatId) {
-        console.error('STORAGE_CHAT_ID is not set in .env file.');
-        throw new Error('Telegram storage chat is not configured.');
+        console.error('STORAGE_CHAT_ID is not set.');
+        throw new Error('Storage service is not configured. Please contact support.');
     }
     return chatId;
 }
