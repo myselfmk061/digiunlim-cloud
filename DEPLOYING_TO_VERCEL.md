@@ -27,7 +27,7 @@ Vercel will automatically know it's a Next.js project. You just need to add your
 1.  Scroll down until you see the section called **Environment Variables**.
 2.  You will add two secrets here, one by one.
 
-    *   **Name:** `TELEGRAM_BOT_TOKEN`
+    *   **Name:** `VERIFICATION_BOT_TOKEN`
     *   **Value:** `[Your Bot Token from BotFather]`
     *   Click **Add**.
     *   **Name:** `TELEGRAM_CHAT_ID`

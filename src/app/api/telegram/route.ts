@@ -5,9 +5,9 @@ import type { NextRequest } from 'next/server';
 import type { AppFile } from '@/types';
 
 function getBotToken() {
-    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const token = process.env.VERIFICATION_BOT_TOKEN;
     if (!token) {
-        console.error('TELEGRAM_BOT_TOKEN is not set.');
+        console.error('VERIFICATION_BOT_TOKEN is not set.');
         throw new Error('Storage service is not configured. Please contact support.');
     }
     return token;

@@ -15,13 +15,13 @@ export async function POST(request: Request) {
       );
     }
     
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const botToken = process.env.VERIFICATION_BOT_TOKEN;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
        process.env.NODE_ENV === 'production' ? 'https://your-app.vercel.app' : 'http://localhost:9002');
 
     if (!botToken) {
-      console.error('TELEGRAM_BOT_TOKEN is not set.');
+      console.error('VERIFICATION_BOT_TOKEN is not set.');
       return NextResponse.json(
         { error: 'Verification service is not configured. Please contact support.' },
         { status: 500 }

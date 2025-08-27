@@ -1,6 +1,6 @@
 # How to Create a Telegram Bot and Get Credentials
 
-This guide will show you how to create a single Telegram bot and get the `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` needed for your application to work.
+This guide will show you how to create a single Telegram bot and get the `VERIFICATION_BOT_TOKEN` and `TELEGRAM_CHAT_ID` needed for your application to work.
 
 ---
 
@@ -23,7 +23,7 @@ This part is the same for everyone.
 3.  **Get Your Bot Token:**
     *   Once you've chosen a unique username, BotFather will give you a **token**.
     *   **Copy this token.** It will look like `7123456789:AAG_AbcDef1234GhijKlmnOpqrstUvWxYz`.
-    *   This is your `TELEGRAM_BOT_TOKEN`.
+    *   This is your `VERIFICATION_BOT_TOKEN`.
 
     ![Step 3: Get Token](https://storage.googleapis.com/studioprod-%E2%80%94%CE%B2%CE%BF%CE%B7%CE%B8%CF%8C%CF%82.appspot.com/assets/telegram_token.png)
 
@@ -75,4 +75,4 @@ If you want to use the bot to upload and store files in a separate, private plac
 
 ### You're Done!
 
-You now have your `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`. You can add these to your project's `.env` file or Vercel environment variables.
+You now have your `VERIFICATION_BOT_TOKEN` and `TELEGRAM_CHAT_ID`. You can add these to your project's `.env` file or Vercel environment variables.
