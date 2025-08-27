@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cloud, Loader2, Phone, Send } from 'lucide-react';
+import { Cloud, Loader2, Phone, Send, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -70,7 +70,7 @@ const countryCodes = [
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLinkSent, setIsLinkSent] = useState(false);
-  const router = useRouter();
+  const [loginData, setLoginData] = useState<{fullPhoneNumber: string} | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof FormSchema>>({
