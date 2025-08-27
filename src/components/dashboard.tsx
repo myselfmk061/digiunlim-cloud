@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, ChangeEvent, useEffect, Suspense } from 'react';
+import { useState, useRef, ChangeEvent, useEffect, Suspense, useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -22,7 +22,7 @@ import {
   Settings,
   Search,
   Camera,
-  CheckCircle,
+  CheckCircle2,
   Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -150,13 +150,13 @@ function DashboardContent() {
     router.push('/');
   };
 
-  const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelectFromInput = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       uploadFiles(Array.from(event.target.files));
     }
   };
   
-  const uploadFiles = async (fileList: File[]) => {
+  const uploadFiles = useCallback(async (fileList: File[]) => {
     setIsUploading(true);
     for (const file of fileList) {
         const formData = new FormData();
@@ -181,7 +181,12 @@ function DashboardContent() {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
+                let errorData;
+                try {
+                    errorData = await response.json();
+                } catch {
+                    throw new Error(`Upload failed: ${response.status}`);
+                }
                 throw new Error(errorData.error || 'Upload failed');
             }
 
@@ -202,7 +207,7 @@ function DashboardContent() {
         }
     }
     setIsUploading(false);
-  };
+  }, [toast]);
 
 
   const handleDragEnter = (e: React.DragEvent) => {
@@ -314,7 +319,12 @@ function DashboardContent() {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch {
+                throw new Error(`Delete failed: ${response.status}`);
+            }
             throw new Error(errorData.error || 'Failed to delete file.');
         }
 
@@ -362,14 +372,17 @@ function DashboardContent() {
     return <FileIcon className="h-8 w-8 text-primary" />;
   };
   
-  const filteredFiles = files.filter(file => file.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredFiles = useMemo(() => 
+    files.filter(file => file.name.toLowerCase().includes(searchTerm.toLowerCase())),
+    [files, searchTerm]
+  );
 
   if (showVerificationMessage) {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-background">
             <Card className="p-8 text-center shadow-2xl">
                 <CardContent className="flex flex-col items-center gap-4">
-                    <CheckCircle className="h-16 w-16 text-green-500 animate-pulse" />
+                    <CheckCircle2 className="h-16 w-16 text-green-500 animate-pulse" />
                     <h1 className="text-2xl font-bold">Successfully verified by Telegram</h1>
                     <p className="text-muted-foreground">Redirecting to your dashboard...</p>
                 </CardContent>
@@ -446,7 +459,7 @@ function DashboardContent() {
           <input
             type="file"
             ref={fileInputRef}
-            onChange={handleFileSelect}
+            onChange={handleFileSelectFromInput}
             className="hidden"
             multiple
             disabled={isUploading}
@@ -558,7 +571,7 @@ function DashboardContent() {
                     {(file.size / (1024 * 1024)).toFixed(2)} MB
                 </p>
                 {selectedFiles.has(file.id) && (
-                  <CheckCircle className="absolute right-2 top-2 h-5 w-5 text-primary" />
+                  <CheckCircle2 className="absolute right-2 top-2 h-5 w-5 text-primary" />
                 )}
               </CardContent>
                <DropdownMenu>
@@ -613,7 +626,7 @@ function DashboardContent() {
                 <DialogTitle>Share File</DialogTitle>
                 <DialogDescription>
                     Anyone with this link can view and download the file. This link is not secure.
-                </DialogDescription>
+                </DailogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
                 <div className="space-y-2">

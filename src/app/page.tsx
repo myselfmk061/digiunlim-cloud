@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Cloud, FileLock, Share2 } from 'lucide-react';
+import { CheckCircle2, Cloud, FileLock, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { Footer } from '@/components/footer';
 
@@ -123,16 +123,16 @@ export default function Home() {
                   </p>
                   <ul className="w-full space-y-2 text-foreground/90">
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500" /> Unlimited File Uploads
+                      <CheckCircle2 className="h-5 w-5 text-green-500" /> Unlimited File Uploads
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500" /> Unlimited Storage
+                      <CheckCircle2 className="h-5 w-5 text-green-500" /> Unlimited Storage
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500" /> Secure File Sharing
+                      <CheckCircle2 className="h-5 w-5 text-green-500" /> Secure File Sharing
                     </li>
                      <li className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500" /> Telegram Integration
+                      <CheckCircle2 className="h-5 w-5 text-green-500" /> Telegram Integration
                     </li>
                   </ul>
                   <Button size="lg" className="w-full" asChild>

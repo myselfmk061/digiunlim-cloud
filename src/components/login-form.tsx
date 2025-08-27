@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, lazy } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -94,7 +94,12 @@ export function LoginForm() {
         });
 
         if (!response.ok) {
-            const errorResult = await response.json();
+            let errorResult;
+            try {
+                errorResult = await response.json();
+            } catch {
+                throw new Error(`Server error: ${response.status}`);
+            }
             throw new Error(errorResult.error || 'Failed to send verification link.');
         }
 
