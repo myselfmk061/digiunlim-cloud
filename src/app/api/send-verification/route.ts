@@ -15,7 +15,6 @@ export async function POST(request: Request) {
     }
     
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    // The TELEGRAM_CHAT_ID is for file storage, not user verification. We will use the user's phone number.
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
        process.env.NODE_ENV === 'production' ? 'https://your-app.vercel.app' : 'http://localhost:9002');
@@ -53,7 +52,7 @@ export async function POST(request: Request) {
     if (!result.ok) {
         console.error('Failed to send Telegram message:', result.description);
         // Provide a more helpful error message to the user
-        if (result.description.includes('chat not found')) {
+        if (result.description && result.description.includes('chat not found')) {
              return NextResponse.json(
                 { error: 'Could not send link. Make sure this phone number is on Telegram and you have started a chat with our bot.' },
                 { status: 404 }
@@ -73,4 +72,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'An internal server error occurred.', details: errorMessage }, { status: 500 });
   }
 }
-
