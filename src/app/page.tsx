@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Cloud, FileLock, Share2 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -84,7 +83,7 @@ export default function Home() {
                   <div className="rounded-full bg-primary/10 p-3">
                     <FileLock className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle>Telegram-Powered Security</CardTitle>
+                  <CardTitle>Telegram Security</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p>Leverage the world-class security and encryption of the Telegram network.</p>
