@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { AppFile } from '@/types';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const BOT_TOKEN = process.env.STORAGE_BOT_TOKEN;
+const CHAT_ID = process.env.STORAGE_CHAT_ID;
 const API_BASE_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
 // Helper to get file info from Telegram
@@ -19,7 +19,7 @@ async function getFileInfo(fileId: string) {
 
 export async function POST(request: NextRequest) {
     if (!BOT_TOKEN || !CHAT_ID) {
-        return NextResponse.json({ error: 'Telegram bot not configured.' }, { status: 500 });
+        return NextResponse.json({ error: 'Telegram storage bot not configured.' }, { status: 500 });
     }
 
     try {
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
     if (!BOT_TOKEN || !CHAT_ID) {
-        return NextResponse.json({ error: 'Telegram bot not configured.' }, { status: 500 });
+        return NextResponse.json({ error: 'Telegram storage bot not configured.' }, { status: 500 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
     if (!BOT_TOKEN || !CHAT_ID) {
-        return NextResponse.json({ error: 'Telegram bot not configured.' }, { status: 500 });
+        return NextResponse.json({ error: 'Telegram storage bot not configured.' }, { status: 500 });
     }
 
     const { searchParams } = new URL(request.url);

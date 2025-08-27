@@ -3,6 +3,9 @@
   "functions": {
     "src/app/**/*.ts": {
       "maxDuration": 120
+    },
+    "src/app/api/**/*.ts": {
+      "maxDuration": 120
     }
   }
 }

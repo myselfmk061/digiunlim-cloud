@@ -6,12 +6,12 @@ export async function POST(request: Request) {
     const { phoneNumber, countryCode } = await request.json();
     const fullPhoneNumber = `${countryCode}${phoneNumber.replace(/\s/g, '')}`;
 
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID; // IMPORTANT: See instructions below
+    const botToken = process.env.VERIFICATION_BOT_TOKEN;
+    const chatId = process.env.VERIFICATION_CHAT_ID;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
 
     if (!botToken || !chatId) {
-      console.error('TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not set.');
+      console.error('VERIFICATION_BOT_TOKEN or VERIFICATION_CHAT_ID is not set.');
       // In a real app, you might want to return a more generic error message.
       // For this example, we'll proceed to simulate success for the frontend.
       // throw new Error('Server configuration error.');

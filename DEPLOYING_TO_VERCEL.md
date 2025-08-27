@@ -20,24 +20,30 @@ Make sure your code is on GitHub. If you haven't done this, please ask me "How d
 
 ### Step 2: Configure Your Project
 
-Vercel will automatically know it's a Next.js project. You just need to add your secrets.
+Vercel will automatically know it's a Next.js project. You just need to add your secrets for your two Telegram bots.
 
 1.  Scroll down until you see the section called **Environment Variables**.
-2.  You will add two secrets here, one by one.
+2.  You will add four secrets here, one by one.
 
-    **First Secret:**
-    *   In the **Name** box, type `TELEGRAM_BOT_TOKEN`
-    *   In the **Value** box, paste your token: `8485783789:AAHNm4cHNMfwncpDbtQ_ktBZoJuvwojTLK0`
-    *   Click the **Add** button.
+    **First Bot (For Verification):**
+    *   **Name:** `VERIFICATION_BOT_TOKEN`
+    *   **Value:** `[Your Verification Bot Token]`
+    *   Click **Add**.
+    *   **Name:** `VERIFICATION_CHAT_ID`
+    *   **Value:** `[Your Verification Bot Chat ID]`
+    *   Click **Add**.
 
-    **Second Secret:**
-    *   In the **Name** box, type `TELEGRAM_CHAT_ID`
-    *   In the **Value** box, paste your Chat ID: `-1003081182923`
-    *   Click the **Add** button.
+    **Second Bot (For Storage):**
+    *   **Name:** `STORAGE_BOT_TOKEN`
+    *   **Value:** `[Your Storage Bot Token]`
+    *   Click **Add**.
+    *   **Name:** `STORAGE_CHAT_ID`
+    *   **Value:** `[Your Storage Bot Chat ID]`
+    *   Click **Add**.
 
-It should look like this:
+It should look similar to this (with your own values):
 
-![Step 2: Add Environment Variables](https://storage.googleapis.com/studioprod- βοηθός.appspot.com/assets/vercel_env_vars.png)
+![Step 2: Add Environment Variables](https://storage.googleapis.com/studioprod-%20%E2%80%94%CE%B2%CE%BF%CE%B7%CE%B8%CF%8C%CF%82.appspot.com/assets/vercel_dual_bot_env.png)
 
 ---
 
