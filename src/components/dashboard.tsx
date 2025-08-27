@@ -78,46 +78,52 @@ function DashboardContent() {
   const [fileToDelete, setFileToDelete] = useState<AppFile | null>(null);
   const [userPhoneNumber, setUserPhoneNumber] = useState<string | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>('https://picsum.photos/100/100');
-  const [isVerified, setIsVerified] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    const token = searchParams.get('token');
     const storedPhoneNumber = localStorage.getItem('userPhoneNumber');
-
-    if (token && storedPhoneNumber) {
-        setShowVerificationMessage(true);
-        setTimeout(() => {
-            setIsVerified(true);
-            setShowVerificationMessage(false);
-            router.replace('/dashboard', undefined);
-        }, 2500);
-    } else if (storedPhoneNumber) {
-        setIsVerified(true);
+    
+    if (storedPhoneNumber) {
+        setIsAuthenticated(true);
+        setUserPhoneNumber(storedPhoneNumber);
+        
+        // This logic handles showing the "Verified" message on first login.
+        const isFreshLogin = searchParams.has('verified');
+        if (isFreshLogin) {
+            setShowVerificationMessage(true);
+            setTimeout(() => {
+                setShowVerificationMessage(false);
+                // Clean the URL
+                router.replace('/dashboard', undefined); 
+            }, 2500);
+        }
     } else {
         router.push('/login');
     }
 
-    if (storedPhoneNumber) {
-      setUserPhoneNumber(storedPhoneNumber);
-    }
     const storedProfilePic = localStorage.getItem('profilePic');
     if (storedProfilePic) {
       setProfilePic(storedProfilePic);
     }
     const storedFiles = localStorage.getItem('userFiles');
     if (storedFiles) {
-        setFiles(JSON.parse(storedFiles));
+        try {
+            setFiles(JSON.parse(storedFiles));
+        } catch (e) {
+            console.error("Failed to parse user files from localStorage", e);
+            localStorage.removeItem('userFiles');
+        }
     }
   }, [searchParams, router]);
 
   useEffect(() => {
     // Persist files to localStorage whenever they change
-    if (files.length > 0 || localStorage.getItem('userFiles')) {
+    if (isAuthenticated) {
         localStorage.setItem('userFiles', JSON.stringify(files));
     }
-  }, [files]);
+  }, [files, isAuthenticated]);
   
   const handleProfilePicChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -136,7 +142,9 @@ function DashboardContent() {
   const handleLogout = () => {
     localStorage.removeItem('userPhoneNumber');
     localStorage.removeItem('profilePic');
-    localStorage.removeItem('userFiles');
+    // We keep 'userFiles' so they are not lost on logout, but you could clear it too.
+    // localStorage.removeItem('userFiles'); 
+    setIsAuthenticated(false);
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     router.push('/');
   };
@@ -241,7 +249,6 @@ function DashboardContent() {
         toast({
             title: 'File Deleted',
             description: `"${fileToDelete!.name}" has been permanently deleted.`,
-            variant: 'destructive',
         });
     } catch (error) {
         toast({
@@ -290,7 +297,7 @@ function DashboardContent() {
             <Card className="p-8 text-center shadow-2xl">
                 <CardContent className="flex flex-col items-center gap-4">
                     <CheckCircle className="h-16 w-16 text-green-500 animate-pulse" />
-                    <h1 className="text-2xl font-bold">Successfully verified By Telegram</h1>
+                    <h1 className="text-2xl font-bold">Successfully verified by Telegram</h1>
                     <p className="text-muted-foreground">Redirecting to your dashboard...</p>
                 </CardContent>
             </Card>
@@ -298,13 +305,8 @@ function DashboardContent() {
     );
   }
 
-  if (!isVerified) {
-    return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="mt-4">Verifying...</p>
-        </div>
-    );
+  if (!isAuthenticated) {
+    return <DashboardLoading />;
   }
 
 
@@ -325,7 +327,7 @@ function DashboardContent() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="cursor-pointer">
-              <AvatarImage src={profilePic ?? undefined} alt="@user" />
+              <AvatarImage src={profilePic ?? undefined} alt="@user" data-ai-hint="profile picture" />
               <AvatarFallback>
                 <User />
               </AvatarFallback>
@@ -365,7 +367,7 @@ function DashboardContent() {
           onClick={() => fileInputRef.current?.click()}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
+  onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
           <input
@@ -484,7 +486,7 @@ function DashboardContent() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setFileToDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

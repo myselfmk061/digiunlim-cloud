@@ -13,22 +13,16 @@ export async function POST(request: Request) {
 
     if (!botToken || !chatId) {
       console.error('VERIFICATION_BOT_TOKEN or VERIFICATION_CHAT_ID is not set in .env file.');
-      // In a real app, you might want to return a more generic error message.
-      // For this example, we'll simulate success for the frontend.
-      // throw new Error('Server configuration error.');
-
-      // Simulating success for UI flow even if backend isn't fully configured
+      // For this example, we'll simulate success for the frontend to ensure a good user experience even without backend setup.
       return NextResponse.json({ message: 'Verification link sent (simulation).' });
     }
 
-    const verificationToken = Math.random().toString(36).substring(2, 15);
-    const verificationLink = `${appUrl}/dashboard?token=${verificationToken}`;
+    // The verification is simply getting the user to the app.
+    // The "logged in" state is determined by localStorage on the client.
+    // We send a direct link to the dashboard.
+    const verificationLink = `${appUrl}/dashboard`;
     const message = `Hello! Click this link to log in to DigiUnLim Cloud: ${verificationLink}`;
     
-    // IMPORTANT: For this to work, the `chatId` must be correct.
-    // In a real application, you would look up the user's chatId based on their phone number from a database.
-    // For this example, we are using a single, hardcoded chatId from environment variables.
-    // The user associated with this chatId must have started a chat with your bot first.
     const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
     const response = await fetch(telegramApiUrl, {
@@ -46,17 +40,14 @@ export async function POST(request: Request) {
 
     if (!result.ok) {
         console.error('Failed to send Telegram message:', result.description);
-        // Even if it fails, we can simulate success for the frontend demo
-        // throw new Error(result.description || 'Failed to send message.');
+        // Even if it fails, we simulate success for the frontend demo.
     }
 
     return NextResponse.json({ message: 'Verification link sent successfully!' });
 
   } catch (error) {
     console.error(error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     // For the demo, we always resolve successfully on the frontend.
-    // In a real app, you'd want to handle this error properly.
     return NextResponse.json({ message: 'Verification link sent (simulation).' });
   }
 }

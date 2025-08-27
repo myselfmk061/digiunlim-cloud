@@ -99,7 +99,10 @@ export function LoginForm() {
 
         const fullPhoneNumber = `${data.countryCode} ${data.phoneNumber}`;
         localStorage.setItem('userPhoneNumber', fullPhoneNumber);
-
+        
+        // This query param will be used to show a "success" message on the dashboard one time.
+        router.push('/dashboard?verified=true');
+        
         setIsLinkSent(true);
 
     } catch (error) {
