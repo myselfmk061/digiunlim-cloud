@@ -1,7 +1,6 @@
 // src/app/api/auth/start/route.ts
-import 'dotenv/config';
 import { NextResponse } from 'next/server';
-import { kv } from '@vercel/kv';
+import { redis } from '@/lib/redis';
 import { randomUUID } from 'crypto';
 
 export async function POST(request: Request) {
@@ -21,17 +20,19 @@ export async function POST(request: Request) {
     const fullPhoneNumber = countryCode + phoneNumber;
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes from now
 
-    // 2. Store the token in Vercel KV
-    await kv.set(
-      `auth:${token}`,
-      {
+    // 2. Store the token in Upstash Redis
+    const key = `auth:${token}`;
+    const value = {
         status: 'PENDING',
         phoneNumber: fullPhoneNumber,
         createdAt: Date.now(),
         expiresAt: expiresAt,
-      },
-      { ex: 600 } // Expire key in KV after 10 minutes
-    );
+    };
+    
+    await redis.set(key, JSON.stringify(value), {
+      ex: 600 // Expire key in Redis after 10 minutes
+    });
+
 
     // 3. Send the token back to the frontend
     return NextResponse.json({ token });

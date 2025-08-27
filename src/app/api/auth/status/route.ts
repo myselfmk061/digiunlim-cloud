@@ -1,7 +1,6 @@
 // src/app/api/auth/status/route.ts
-import 'dotenv/config';
 import { NextResponse, type NextRequest } from 'next/server';
-import { kv } from '@vercel/kv';
+import { redis } from '@/lib/redis';
 
 type AuthTokenData = {
   status: 'PENDING' | 'VERIFIED' | 'EXPIRED';
@@ -20,11 +19,13 @@ export async function GET(request: NextRequest) {
     }
 
     const key = `auth:${token}`;
-    const tokenData = await kv.get<AuthTokenData>(key);
+    const data = await redis.get<string>(key);
 
-    if (!tokenData) {
+    if (!data) {
       return NextResponse.json({ status: 'EXPIRED', error: 'Invalid or expired token.' }, { status: 404 });
     }
+
+    const tokenData: AuthTokenData = JSON.parse(data);
     
     if (Date.now() > tokenData.expiresAt) {
       return NextResponse.json({ status: 'EXPIRED', error: 'Token has expired.' }, { status: 410 });

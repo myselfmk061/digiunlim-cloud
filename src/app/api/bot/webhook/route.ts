@@ -1,7 +1,6 @@
 // src/app/api/bot/webhook/route.ts
-import 'dotenv/config';
 import { NextResponse, type NextRequest } from 'next/server';
-import { kv } from '@vercel/kv';
+import { redis } from '@/lib/redis';
 
 type AuthTokenData = {
   status: 'PENDING' | 'VERIFIED' | 'EXPIRED';
@@ -34,14 +33,16 @@ export async function POST(request: NextRequest) {
     }
 
     const key = `auth:${token}`;
-    const tokenData = await kv.get<AuthTokenData>(key);
+    const data = await redis.get<string>(key);
 
     // 3. Validate the token
-    if (!tokenData) {
+    if (!data) {
       console.warn(`Webhook received an invalid token: ${token}`);
       // We don't need to send a message back, just acknowledge the webhook.
       return NextResponse.json({ status: 'ok' });
     }
+
+    const tokenData: AuthTokenData = JSON.parse(data);
 
     if (Date.now() > tokenData.expiresAt) {
        console.warn(`Webhook received an expired token: ${token}`);
@@ -50,11 +51,10 @@ export async function POST(request: NextRequest) {
 
     if (tokenData.status === 'PENDING') {
       // 4. Update the status to 'VERIFIED'
-      await kv.set(
-        key,
-        { ...tokenData, status: 'VERIFIED' },
-        { ex: 60 * 60 * 24 } // Keep record for 24 hours
-      );
+      const updatedTokenData = { ...tokenData, status: 'VERIFIED' };
+      await redis.set(key, JSON.stringify(updatedTokenData), { 
+        ex: 60 * 60 * 24 // Keep record for 24 hours
+      });
     }
     
     // 5. Acknowledge the webhook request from Telegram
