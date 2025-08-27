@@ -14,13 +14,11 @@ export async function POST(request: Request) {
     const phoneNumber = `${countryCode}${rawPhoneNumber.replace(/\D/g, '')}`;
 
     const loginToken = crypto.randomUUID();
-    const verificationToken = crypto.randomUUID(); // For the link
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes from now
-
-    // Store login token info for polling
+    
+    // Store login token info for polling, including the phone number
     await redis.set(
       `login-token:${loginToken}`,
-      JSON.stringify({ status: 'PENDING', phoneNumber: phoneNumber }), // Include phone number for later
+      JSON.stringify({ status: 'PENDING', phoneNumber: phoneNumber }), // Include phone number
       { ex: 600 } // 10 minute expiry
     );
     
