@@ -4,7 +4,12 @@ Follow these steps carefully to get your website live on the internet.
 
 ## Before You Start
 
-Make sure your code is on GitHub. If you haven't done this, please ask me "How do I put my project on GitHub?" and I will guide you.
+- Make sure your code is on GitHub.
+- You will need to create two separate Telegram bots.
+  - **A Verification Bot:** This bot sends the login link to your personal Telegram account.
+    - [**Follow this guide to create a Verification Bot**](./HOW_TO_CREATE_A_VERIFICATION_BOT.md)
+  - **A Storage Bot:** This bot uploads and stores files in a private channel.
+    - [**Follow this guide to create a Storage Bot**](./HOW_TO_CREATE_A_STORAGE_BOT.md)
 
 ---
 
@@ -12,7 +17,7 @@ Make sure your code is on GitHub. If you haven't done this, please ask me "How d
 
 1.  Open your web browser and go to [https://vercel.com/new](https://vercel.com/new).
 2.  If you are not logged in, sign up using your GitHub account.
-3.  You will see a list of your GitHub projects. Find your project (e.g., `cloud-store-app`) and click the **Import** button.
+3.  You will see a list of your GitHub projects. Find your project and click the **Import** button.
 
 ![Step 1: Import Project on Vercel](https://storage.googleapis.com/studioprod- βοηθός.appspot.com/assets/vercel_import.png)
 
