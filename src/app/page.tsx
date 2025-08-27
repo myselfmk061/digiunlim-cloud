@@ -148,11 +148,7 @@ export default function Home() {
           <div className="text-sm text-foreground/80 text-center md:text-left">
             <p>&copy; 2024 DigiUnLim Cloud. All rights reserved.</p>
             <p className="flex items-center justify-center md:justify-start gap-1">
-              Made by - Myselfmk Apps | Powered by 
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="inline-block">
-                <path d="M9.78 18.65l.28-4.23l7.02-6.64c.38-.34.03-.94-.46-.69L5.31 13.13l-3.56-1.1c-.53-.17-.54-.95.02-1.13l15.58-5.9c.53-.2 1.02.26 1.02.82v12.2c0 .83-.93 1.22-1.5.78L12.03 15.9l-1.74 1.68c-.2.2-.47.26-.72.15z"/>
-              </svg>
-              Telegram
+              Made in India 🇮🇳 Made by Myselfmk Apps📱Made for World 🌍
             </p>
           </div>
           <div className="flex gap-4">
