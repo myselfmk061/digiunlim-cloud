@@ -15,13 +15,13 @@ export async function POST(request: Request) {
     }
     
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    // The TELEGRAM_CHAT_ID is for file storage, not user verification. We will use the user's phone number.
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
        process.env.NODE_ENV === 'production' ? 'https://your-app.vercel.app' : 'http://localhost:9002');
 
-    if (!botToken || !chatId) {
-      console.error('TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not set.');
+    if (!botToken) {
+      console.error('TELEGRAM_BOT_TOKEN is not set.');
       return NextResponse.json(
         { error: 'Verification service is not configured. Please contact support.' },
         { status: 500 }
@@ -29,13 +29,13 @@ export async function POST(request: Request) {
     }
 
     const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    const verificationLink = `${appUrl}/verify?token=${token}&phone=${encodeURIComponent(countryCode + phoneNumber)}`;
+    const fullPhoneNumber = countryCode + phoneNumber;
+    const verificationLink = `${appUrl}/verify?token=${token}&phone=${encodeURIComponent(fullPhoneNumber)}`;
     const message = `🔐 DigiUnLim Cloud Login\n\nClick this link to access your account:\n${verificationLink}\n\n⚠️ This link is secure and expires in 10 minutes.`;
     
-    const fullPhoneNumber = countryCode + phoneNumber;
     const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
-    // The chat_id for sending the message will be the user's phone number.
+    // The chat_id for sending the message will be the user's phone number (including country code).
     // The user must have started a chat with the bot for this to work.
     const response = await fetch(telegramApiUrl, {
         method: 'POST',
@@ -73,3 +73,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'An internal server error occurred.', details: errorMessage }, { status: 500 });
   }
 }
+

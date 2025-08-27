@@ -4,8 +4,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
-import { useState, lazy } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -18,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cloud, Loader2, Phone, Send, ExternalLink } from 'lucide-react';
+import { Cloud, Loader2, Phone, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
