@@ -5,19 +5,19 @@ import type { NextRequest } from 'next/server';
 import type { AppFile } from '@/types';
 
 function getBotToken() {
-    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const token = process.env.STORAGE_BOT_TOKEN;
     if (!token) {
-        console.error('TELEGRAM_BOT_TOKEN is not set in .env file.');
-        throw new Error('Telegram bot is not configured.');
+        console.error('STORAGE_BOT_TOKEN is not set in .env file.');
+        throw new Error('Telegram storage bot is not configured.');
     }
     return token;
 }
 
 function getChatId() {
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const chatId = process.env.STORAGE_CHAT_ID;
     if (!chatId) {
-        console.error('TELEGRAM_CHAT_ID is not set in .env file.');
-        throw new Error('Telegram chat is not configured.');
+        console.error('STORAGE_CHAT_ID is not set in .env file.');
+        throw new Error('Telegram storage chat is not configured.');
     }
     return chatId;
 }
