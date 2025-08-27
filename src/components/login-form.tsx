@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cloud, Loader2, Phone, Send, AlertTriangle } from 'lucide-react';
+import { Cloud, Loader2, Phone, Send, AlertTriangle, ShieldCheck, ArrowLeft, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -68,8 +68,8 @@ const countryCodes = [
 
 
 export function LoginForm() {
+  const [step, setStep] = useState<'agreement' | 'form' | 'sent'>('agreement');
   const [isLoading, setIsLoading] = useState(false);
-  const [isLinkSent, setIsLinkSent] = useState(false);
   const { toast } = useToast();
   const [errorState, setErrorState] = useState<{ message: string; showBotLink: boolean }>({ message: '', showBotLink: false });
   const verificationBotUsername = process.env.NEXT_PUBLIC_VERIFICATION_BOT_USERNAME;
@@ -107,7 +107,7 @@ export function LoginForm() {
                 throw new Error(`Server error: ${response.status}`);
             }
             const errorMessage = errorResult.error || 'Failed to send verification link.';
-             if (errorMessage.includes('chat not found')) {
+             if (response.status === 404 && errorMessage.includes('Could not send link')) {
                 setErrorState({ message: errorMessage, showBotLink: true });
             } else {
                  toast({
@@ -122,7 +122,7 @@ export function LoginForm() {
         const fullPhoneNumber = `${data.countryCode}${data.phoneNumber}`;
         localStorage.setItem('userPhoneNumber', fullPhoneNumber);
         
-        setIsLinkSent(true);
+        setStep('sent');
         
     } catch (error) {
         console.error(error);
@@ -136,7 +136,7 @@ export function LoginForm() {
     }
   }
   
-  if (isLinkSent) {
+  if (step === 'sent') {
       return (
           <Card className="w-full max-w-md shadow-2xl">
               <CardHeader className="text-center">
@@ -149,12 +149,48 @@ export function LoginForm() {
                   </CardDescription>
               </CardHeader>
               <CardContent>
-                  <Button variant="outline" className="w-full" onClick={() => setIsLinkSent(false)}>
-                      Go Back
+                  <Button variant="outline" className="w-full" onClick={() => setStep('form')}>
+                      <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
                   </Button>
               </CardContent>
           </Card>
       );
+  }
+
+  if (step === 'agreement') {
+    return (
+        <Card className="w-full max-w-md shadow-2xl">
+            <CardHeader className="text-center">
+                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                    <Info className="h-8 w-8 text-primary" />
+                </div>
+                <CardTitle className="text-2xl font-bold">Login Requirements</CardTitle>
+                <CardDescription>
+                    Please read the following before you proceed.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="rounded-lg bg-blue-50 p-4 text-sm text-left dark:bg-blue-900/20">
+                    <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">📋 Requirements:</h3>
+                    <ul className="space-y-1 text-blue-800 dark:text-blue-300 list-disc list-inside">
+                        <li>An active Telegram account.</li>
+                        <li>The phone number must be linked to your Telegram.</li>
+                    </ul>
+                </div>
+                <div className="rounded-lg bg-amber-50 p-4 text-sm text-left dark:bg-amber-900/20">
+                    <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">⚠️ Important:</h3>
+                    <ul className="space-y-1 text-amber-800 dark:text-amber-300 list-disc list-inside">
+                        <li>You must start a chat with our bot on Telegram before you can receive the link.</li>
+                        <li>Check your Telegram messages for the verification link.</li>
+                        <li>The link expires in 10 minutes.</li>
+                    </ul>
+                </div>
+                <Button className="w-full" onClick={() => setStep('form')}>
+                    <ShieldCheck className="mr-2 h-4 w-4" /> I Agree, Continue
+                </Button>
+            </CardContent>
+        </Card>
+    );
   }
 
   return (
@@ -167,21 +203,6 @@ export function LoginForm() {
         <CardDescription>
           Enter your phone number to receive a verification link on Telegram.
         </CardDescription>
-        <div className="mt-4 rounded-lg bg-blue-50 p-4 text-sm text-left dark:bg-blue-900/20">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">📋 Requirements:</h3>
-          <ul className="space-y-1 text-blue-800 dark:text-blue-300 list-disc list-inside">
-            <li>An active Telegram account.</li>
-            <li>The phone number must be linked to your Telegram.</li>
-          </ul>
-        </div>
-        <div className="mt-3 rounded-lg bg-amber-50 p-4 text-sm text-left dark:bg-amber-900/20">
-          <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">⚠️ Important:</h3>
-          <ul className="space-y-1 text-amber-800 dark:text-amber-300 list-disc list-inside">
-            <li>You must have started a conversation with our bot on Telegram before you can receive the link.</li>
-            <li>Check your Telegram messages for the verification link.</li>
-            <li>The link expires in 10 minutes.</li>
-          </ul>
-        </div>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -251,6 +272,9 @@ export function LoginForm() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isLoading ? 'Sending Link...' : 'Send Verification Link'}
+            </Button>
+            <Button variant="link" className="w-full text-muted-foreground" onClick={() => setStep('agreement')}>
+              Back to Requirements
             </Button>
           </form>
         </Form>
