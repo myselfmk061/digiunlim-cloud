@@ -6,8 +6,14 @@ export async function POST(request: Request) {
   try {
     const { phoneNumber, countryCode } = await request.json();
     
+    if (!phoneNumber || !countryCode) {
+      return NextResponse.json({ error: 'Phone number and country code are required.' }, { status: 400 });
+    }
+    
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002');
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
+       process.env.NODE_ENV === 'production' ? 'https://your-app.vercel.app' : 'http://localhost:9002');
 
     if (!botToken) {
       console.error('TELEGRAM_BOT_TOKEN is not set.');
@@ -17,7 +23,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate a secure token for verification
     const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
     const verificationLink = `${appUrl}/verify?token=${token}&phone=${encodeURIComponent(countryCode + phoneNumber)}`;
     const message = `🔐 DigiUnLim Cloud Login\n\nClick this link to access your account:\n${verificationLink}\n\n⚠️ This link is secure and expires in 10 minutes.`;
@@ -33,7 +38,6 @@ export async function POST(request: Request) {
         body: JSON.stringify({
             chat_id: fullPhoneNumber,
             text: message,
-            parse_mode: 'Markdown'
         }),
     });
 
@@ -41,15 +45,14 @@ export async function POST(request: Request) {
 
     if (!result.ok) {
         console.error('Failed to send Telegram message:', result.description);
-        // Provide a more user-friendly error message
         if (result.description.includes('chat not found')) {
              return NextResponse.json(
-                { error: 'Could not send link. Make sure this phone number is on Telegram and you have started a chat with the bot.' },
+                { error: 'Could not send link. Make sure this phone number is on Telegram and you have started a chat with our bot.' },
                 { status: 404 }
             );
         }
         return NextResponse.json(
-            { error: 'Could not send verification link. Please check bot configuration.' },
+            { error: 'Could not send verification link. Please check the phone number and try again.' },
             { status: 500 }
         );
     }

@@ -70,7 +70,6 @@ const countryCodes = [
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLinkSent, setIsLinkSent] = useState(false);
-  const [loginData, setLoginData] = useState<{fullPhoneNumber: string} | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -90,7 +89,10 @@ export function LoginForm() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify({
+              countryCode: data.countryCode,
+              phoneNumber: data.phoneNumber,
+            }),
         });
 
         if (!response.ok) {
@@ -103,12 +105,10 @@ export function LoginForm() {
             throw new Error(errorResult.error || 'Failed to send verification link.');
         }
 
-        const fullPhoneNumber = `${data.countryCode} ${data.phoneNumber}`;
+        const fullPhoneNumber = `${data.countryCode}${data.phoneNumber}`;
         localStorage.setItem('userPhoneNumber', fullPhoneNumber);
         
         setIsLinkSent(true);
-        // This will now only happen after the link is successfully sent.
-        // We no longer redirect automatically, the user must click the link.
         
     } catch (error) {
         console.error(error);
@@ -153,16 +153,16 @@ export function LoginForm() {
         <CardDescription>
           Enter your phone number to receive a verification link on Telegram.
         </CardDescription>
-        <div className="mt-4 rounded-lg bg-blue-50 p-4 text-sm text-left">
-          <h3 className="font-semibold text-blue-900 mb-2">📋 Requirements:</h3>
-          <ul className="space-y-1 text-blue-800 list-disc list-inside">
+        <div className="mt-4 rounded-lg bg-blue-50 p-4 text-sm text-left dark:bg-blue-900/20">
+          <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">📋 Requirements:</h3>
+          <ul className="space-y-1 text-blue-800 dark:text-blue-300 list-disc list-inside">
             <li>An active Telegram account.</li>
             <li>The phone number must be linked to your Telegram.</li>
           </ul>
         </div>
-        <div className="mt-3 rounded-lg bg-amber-50 p-4 text-sm text-left">
-          <h3 className="font-semibold text-amber-900 mb-2">⚠️ Important:</h3>
-          <ul className="space-y-1 text-amber-800 list-disc list-inside">
+        <div className="mt-3 rounded-lg bg-amber-50 p-4 text-sm text-left dark:bg-amber-900/20">
+          <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">⚠️ Important:</h3>
+          <ul className="space-y-1 text-amber-800 dark:text-amber-300 list-disc list-inside">
             <li>You must have started a conversation with our bot on Telegram before you can receive the link.</li>
             <li>Check your Telegram messages for the verification link.</li>
             <li>The link expires in 10 minutes.</li>

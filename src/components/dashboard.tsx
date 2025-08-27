@@ -626,7 +626,7 @@ function DashboardContent() {
                 <DialogTitle>Share File</DialogTitle>
                 <DialogDescription>
                     Anyone with this link can view and download the file. This link is not secure.
-                </DailogDescription>
+                </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
                 <div className="space-y-2">

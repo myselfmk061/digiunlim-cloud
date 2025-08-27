@@ -26,15 +26,15 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    serverComponentsExternalPackages: ['sharp'],
   },
-  serverExternalPackages: ['sharp'],
   output: 'standalone',
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   poweredByHeader: false,
   compress: true,
+  swcMinify: true,
 };
 
 export default nextConfig;
