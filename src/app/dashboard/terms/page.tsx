@@ -62,7 +62,7 @@ export default function TermsOfServicePage() {
                 </section>
                  <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">8. Contact Us</h2>
-                    <p>If you have any questions about these Terms, please contact us at <a href="mailto:support@digiunlim.cloud" className="text-primary underline">support@digiunlim.cloud</a>.</p>
+                    <p>If you have any questions about these Terms, please contact us at <a href="mailto:myselfmkapps@gmail.com" className="text-primary underline">myselfmkapps@gmail.com</a>.</p>
                 </section>
             </CardContent>
         </Card>
