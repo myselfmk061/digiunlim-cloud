@@ -1,0 +1,17 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/send-verification/route": "app/api/send-verification/route.js",
+  "/api/telegram/route": "app/api/telegram/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/manifest.json/route": "app/manifest.json/route.js",
+  "/dashboard/contact/page": "app/dashboard/contact/page.js",
+  "/dashboard/faq/page": "app/dashboard/faq/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/privacy-policy/page": "app/dashboard/privacy-policy/page.js",
+  "/dashboard/settings/page": "app/dashboard/settings/page.js",
+  "/dashboard/terms/page": "app/dashboard/terms/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/share/[fileId]/[fileName]/page": "app/share/[fileId]/[fileName]/page.js",
+  "/verify/page": "app/verify/page.js"
+}

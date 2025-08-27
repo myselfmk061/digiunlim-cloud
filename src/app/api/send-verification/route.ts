@@ -4,19 +4,24 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { phoneNumber, countryCode } = await request.json();
+    const body = await request.json();
+    const { phoneNumber, countryCode } = body;
     
     if (!phoneNumber || !countryCode) {
-      return NextResponse.json({ error: 'Phone number and country code are required.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Phone number and country code are required.' },
+        { status: 400 }
+      );
     }
     
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
        process.env.NODE_ENV === 'production' ? 'https://your-app.vercel.app' : 'http://localhost:9002');
 
-    if (!botToken) {
-      console.error('TELEGRAM_BOT_TOKEN is not set.');
+    if (!botToken || !chatId) {
+      console.error('TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not set.');
       return NextResponse.json(
         { error: 'Verification service is not configured. Please contact support.' },
         { status: 500 }
@@ -30,6 +35,8 @@ export async function POST(request: Request) {
     const fullPhoneNumber = countryCode + phoneNumber;
     const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
+    // The chat_id for sending the message will be the user's phone number.
+    // The user must have started a chat with the bot for this to work.
     const response = await fetch(telegramApiUrl, {
         method: 'POST',
         headers: {
@@ -45,6 +52,7 @@ export async function POST(request: Request) {
 
     if (!result.ok) {
         console.error('Failed to send Telegram message:', result.description);
+        // Provide a more helpful error message to the user
         if (result.description.includes('chat not found')) {
              return NextResponse.json(
                 { error: 'Could not send link. Make sure this phone number is on Telegram and you have started a chat with our bot.' },
