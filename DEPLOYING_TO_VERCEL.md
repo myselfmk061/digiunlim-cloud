@@ -5,11 +5,8 @@ Follow these steps carefully to get your website live on the internet.
 ## Before You Start
 
 - Make sure your code is on GitHub.
-- You will need to create two separate Telegram bots.
-  - **A Verification Bot:** This bot sends the login link to your personal Telegram account.
-    - [**Follow this guide to create a Verification Bot**](./HOW_TO_CREATE_A_VERIFICATION_BOT.md)
-  - **A Storage Bot:** This bot uploads and stores files in a private channel.
-    - [**Follow this guide to create a Storage Bot**](./HOW_TO_CREATE_A_STORAGE_BOT.md)
+- You will need to create a Telegram bot. This bot will be used for both sending login links and for storing files.
+  - [**Follow this guide to create your Telegram Bot**](./HOW_TO_CREATE_A_TELEGRAM_BOT.md)
 
 ---
 
@@ -19,36 +16,27 @@ Follow these steps carefully to get your website live on the internet.
 2.  If you are not logged in, sign up using your GitHub account.
 3.  You will see a list of your GitHub projects. Find your project and click the **Import** button.
 
-![Step 1: Import Project on Vercel](https://storage.googleapis.com/studioprod- βοηθός.appspot.com/assets/vercel_import.png)
+![Step 1: Import Project on Vercel](https://storage.googleapis.com/studioprod-%E2%80%94%CE%B2%CE%BF%CE%B7%CE%B8%CF%8C%CF%82.appspot.com/assets/vercel_import.png)
 
 ---
 
 ### Step 2: Configure Your Project
 
-Vercel will automatically know it's a Next.js project. You just need to add your secrets for your two Telegram bots.
+Vercel will automatically know it's a Next.js project. You just need to add your secrets for your Telegram bot.
 
 1.  Scroll down until you see the section called **Environment Variables**.
-2.  You will add four secrets here, one by one.
+2.  You will add two secrets here, one by one.
 
-    **First Bot (For Verification):**
-    *   **Name:** `VERIFICATION_BOT_TOKEN`
-    *   **Value:** `[Your Verification Bot Token]`
+    *   **Name:** `TELEGRAM_BOT_TOKEN`
+    *   **Value:** `[Your Bot Token from BotFather]`
     *   Click **Add**.
-    *   **Name:** `VERIFICATION_CHAT_ID`
-    *   **Value:** `[Your Verification Bot Chat ID]`
-    *   Click **Add**.
-
-    **Second Bot (For Storage):**
-    *   **Name:** `STORAGE_BOT_TOKEN`
-    *   **Value:** `[Your Storage Bot Token]`
-    *   Click **Add**.
-    *   **Name:** `STORAGE_CHAT_ID`
-    *   **Value:** `[Your Storage Bot Chat ID]`
+    *   **Name:** `TELEGRAM_CHAT_ID`
+    *   **Value:** `[Your Personal Chat ID or Private Channel ID]`
     *   Click **Add**.
 
 It should look similar to this (with your own values):
 
-![Step 2: Add Environment Variables](https://storage.googleapis.com/studioprod-%20%E2%80%94%CE%B2%CE%BF%CE%B7%CE%B8%CF%8C%CF%82.appspot.com/assets/vercel_dual_bot_env.png)
+![Step 2: Add Environment Variables](https://storage.googleapis.com/studioprod-%E2%80%94%CE%B2%CE%BF%CE%B7%CE%B8%CF%8C%CF%82.appspot.com/assets/vercel_env.png)
 
 ---
 
@@ -57,7 +45,7 @@ It should look similar to this (with your own values):
 1.  Now, just click the big blue **Deploy** button.
 2.  Wait for a minute or two while Vercel builds and deploys your site.
 
-![Step 3: Deploy](https://storage.googleapis.com/studioprod- βοηθός.appspot.com/assets/vercel_deploy.png)
+![Step 3: Deploy](https://storage.googleapis.com/studioprod-%E2%80%94%CE%B2%CE%BF%CE%B7%CE%B8%CF%8C%CF%82.appspot.com/assets/vercel_deploy.png)
 
 ---
 
