@@ -183,7 +183,7 @@ export function LoginForm() {
                     <FormControl>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input placeholder="555 123 4567" {...field} className="pl-10" />
+                        <Input placeholder="98765 43210" {...field} className="pl-10" />
                       </div>
                     </FormControl>
                     <FormMessage />
