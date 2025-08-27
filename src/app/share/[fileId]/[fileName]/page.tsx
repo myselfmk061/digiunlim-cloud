@@ -4,19 +4,29 @@
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, File, Cloud } from 'lucide-react';
+import { Download, File, Cloud, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SharePage() {
   const params = useParams();
   const fileId = params.fileId as string;
-  const fileName = decodeURIComponent(params.fileName as string);
+  const fileName = params.fileName ? decodeURIComponent(params.fileName as string) : null;
 
   const handleDownload = () => {
     if (fileId) {
       window.open(`/api/telegram?fileId=${fileId}`, '_blank');
     }
   };
+
+  // Render a loading state until params are available
+  if (!fileId || !fileName) {
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center bg-secondary/30 p-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="mt-4 text-muted-foreground">Loading file details...</p>
+        </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-secondary/30 p-4">
@@ -40,7 +50,7 @@ export default function SharePage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="rounded-md border bg-background/50 p-4 text-center">
-                        <p className="truncate font-medium">{fileName || 'File'}</p>
+                        <p className="truncate font-medium">{fileName}</p>
                     </div>
                     <Button onClick={handleDownload} className="w-full" size="lg">
                         <Download className="mr-2 h-5 w-5" />
