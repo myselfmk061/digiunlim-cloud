@@ -5,8 +5,10 @@ Follow these steps carefully to get your website live on the internet.
 ## Before You Start
 
 - Make sure your code is on GitHub.
-- You will need to create a Telegram bot. This bot will be used for both sending login links and for storing files.
-  - [**Follow this guide to create your Telegram Bot**](./HOW_TO_CREATE_A_TELEGRAM_BOT.md)
+- You will need to create **two** Telegram bots:
+  - One bot for sending login links.
+  - A second bot for storing files.
+  - [**Follow this guide to create your Telegram Bots**](./HOW_TO_CREATE_A_TELEGRAM_BOT.md)
 
 ---
 
@@ -22,16 +24,21 @@ Follow these steps carefully to get your website live on the internet.
 
 ### Step 2: Configure Your Project
 
-Vercel will automatically know it's a Next.js project. You just need to add your secrets for your Telegram bot.
+Vercel will automatically know it's a Next.js project. You just need to add your secrets for your Telegram bots.
 
 1.  Scroll down until you see the section called **Environment Variables**.
-2.  You will add two secrets here, one by one.
+2.  You will add three secrets here, one by one.
 
     *   **Name:** `VERIFICATION_BOT_TOKEN`
-    *   **Value:** `[Your Bot Token from BotFather]`
+    *   **Value:** `[Your Verification Bot Token]`
     *   Click **Add**.
+
+    *   **Name:** `STORAGE_BOT_TOKEN`
+    *   **Value:** `[Your Storage Bot Token]`
+    *   Click **Add**.
+    
     *   **Name:** `TELEGRAM_CHAT_ID`
-    *   **Value:** `[Your Personal Chat ID or Private Channel ID]`
+    *   **Value:** `[Your Private Storage Channel ID]`
     *   Click **Add**.
 
 It should look similar to this (with your own values):

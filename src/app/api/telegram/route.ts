@@ -4,10 +4,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { AppFile } from '@/types';
 
-function getBotToken() {
-    const token = process.env.VERIFICATION_BOT_TOKEN;
+function getStorageBotToken() {
+    const token = process.env.STORAGE_BOT_TOKEN;
     if (!token) {
-        console.error('VERIFICATION_BOT_TOKEN is not set.');
+        console.error('STORAGE_BOT_TOKEN is not set.');
         throw new Error('Storage service is not configured. Please contact support.');
     }
     return token;
@@ -24,7 +24,7 @@ function getChatId() {
 
 // Helper to get file info from Telegram
 async function getFileInfo(fileId: string) {
-    const botToken = getBotToken();
+    const botToken = getStorageBotToken();
     const response = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`);
     const result = await response.json();
     if (!result.ok) {
@@ -35,7 +35,7 @@ async function getFileInfo(fileId: string) {
 
 export async function POST(request: NextRequest) {
     try {
-        const botToken = getBotToken();
+        const botToken = getStorageBotToken();
         const chatId = getChatId();
         const apiBaseUrl = `https://api.telegram.org/bot${botToken}`;
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
     try {
-        const botToken = getBotToken();
+        const botToken = getStorageBotToken();
         const { searchParams } = new URL(request.url);
         const fileId = searchParams.get('fileId');
 
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
     try {
-        const botToken = getBotToken();
+        const botToken = getStorageBotToken();
         const chatId = getChatId();
         const apiBaseUrl = `https://api.telegram.org/bot${botToken}`;
 
