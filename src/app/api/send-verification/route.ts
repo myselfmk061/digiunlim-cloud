@@ -1,5 +1,6 @@
 
 // src/app/api/send-verification/route.ts
+import 'dotenv/config';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
