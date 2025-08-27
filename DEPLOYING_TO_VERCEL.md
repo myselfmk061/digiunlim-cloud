@@ -27,10 +27,14 @@ Follow these steps carefully to get your website live on the internet.
 Vercel will automatically know it's a Next.js project. You just need to add your secrets for your Telegram bots.
 
 1.  Scroll down until you see the section called **Environment Variables**.
-2.  You will add three secrets here, one by one.
+2.  You will add four secrets here, one by one.
 
     *   **Name:** `VERIFICATION_BOT_TOKEN`
     *   **Value:** `[Your Verification Bot Token]`
+    *   Click **Add**.
+
+    *   **Name:** `NEXT_PUBLIC_VERIFICATION_BOT_USERNAME`
+    *   **Value:** `[Your Verification Bot's Username, e.g., MyAppVerifierBot]`
     *   Click **Add**.
 
     *   **Name:** `STORAGE_BOT_TOKEN`

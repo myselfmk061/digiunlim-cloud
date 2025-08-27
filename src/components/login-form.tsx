@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cloud, Loader2, Phone, Send } from 'lucide-react';
+import { Cloud, Loader2, Phone, Send, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from './ui/select';
 import { ScrollArea } from './ui/scroll-area';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 const FormSchema = z.object({
   countryCode: z.string().min(1, 'Country code is required.'),
@@ -70,6 +71,9 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLinkSent, setIsLinkSent] = useState(false);
   const { toast } = useToast();
+  const [errorState, setErrorState] = useState<{ message: string; showBotLink: boolean }>({ message: '', showBotLink: false });
+  const verificationBotUsername = process.env.NEXT_PUBLIC_VERIFICATION_BOT_USERNAME;
+
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -81,6 +85,7 @@ export function LoginForm() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setIsLoading(true);
+    setErrorState({ message: '', showBotLink: false });
 
     try {
         const response = await fetch('/api/send-verification', {
@@ -101,7 +106,17 @@ export function LoginForm() {
             } catch {
                 throw new Error(`Server error: ${response.status}`);
             }
-            throw new Error(errorResult.error || 'Failed to send verification link.');
+            const errorMessage = errorResult.error || 'Failed to send verification link.';
+             if (errorMessage.includes('chat not found')) {
+                setErrorState({ message: errorMessage, showBotLink: true });
+            } else {
+                 toast({
+                    title: 'Error',
+                    description: errorMessage,
+                    variant: 'destructive',
+                });
+            }
+            return;
         }
 
         const fullPhoneNumber = `${data.countryCode}${data.phoneNumber}`;
@@ -213,6 +228,26 @@ export function LoginForm() {
                 )}
               />
             </div>
+            {errorState.message && (
+                <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Action Required</AlertTitle>
+                    <AlertDescription>
+                        {errorState.message}
+                        {errorState.showBotLink && verificationBotUsername && (
+                             <Button
+                                variant="link"
+                                className="p-0 h-auto mt-2"
+                                asChild
+                            >
+                                <a href={`https://t.me/${verificationBotUsername}`} target="_blank" rel="noopener noreferrer">
+                                    Click here to start a chat with the bot.
+                                </a>
+                            </Button>
+                        )}
+                    </AlertDescription>
+                </Alert>
+            )}
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isLoading ? 'Sending Link...' : 'Send Verification Link'}

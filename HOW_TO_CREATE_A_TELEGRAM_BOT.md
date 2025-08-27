@@ -21,12 +21,14 @@ This bot will handle sending secure login links to your users' Telegram accounts
 2.  **Create a New Bot:**
     *   Type the command `/newbot` and send it.
     *   BotFather will ask for a **name**. Choose something clear, like `My App Verifier`.
-    *   Next, it will ask for a **username**. This must be unique and end in `bot` (e.g., `MyAppVerifierBot`).
+    *   Next, it will ask for a **username**. This must be unique and end in `bot` (e.g., `MyAppVerifierBot`). **Save this username.**
 
-3.  **Get Your Verification Bot Token:**
+3.  **Get Your Verification Bot Credentials:**
     *   Once you've chosen a unique username, BotFather will give you a **token**.
     *   **Copy this token.** It will look like `7123456789:AAG_AbcDef1234GhijKlmnOpqrstUvWxYz`.
-    *   This is your `VERIFICATION_BOT_TOKEN`. Save it somewhere safe.
+    *   You now have your two verification credentials:
+        *   `VERIFICATION_BOT_TOKEN`: The token you just copied.
+        *   `NEXT_PUBLIC_VERIFICATION_BOT_USERNAME`: The username you chose (e.g., `MyAppVerifierBot`).
 
     ![Step 3: Get Token](https://storage.googleapis.com/studioprod-%E2%80%94%CE%B2%CE%BF%CE%B7%CE%B8%CF%8C%CF%82.appspot.com/assets/telegram_token.png)
 
@@ -67,8 +69,9 @@ This bot will be responsible for uploading and managing files in a private chann
 
 ### You're Done!
 
-You now have all three required credentials. You can add these to your project's `.env` file or Vercel environment variables.
+You now have all four required credentials. You can add these to your project's `.env` file or Vercel environment variables.
 
 -   `VERIFICATION_BOT_TOKEN`
+-   `NEXT_PUBLIC_VERIFICATION_BOT_USERNAME`
 -   `STORAGE_BOT_TOKEN`
 -   `TELEGRAM_CHAT_ID`
