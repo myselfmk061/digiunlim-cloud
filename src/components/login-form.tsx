@@ -31,8 +31,8 @@ import { ScrollArea } from './ui/scroll-area';
 
 const FormSchema = z.object({
   countryCode: z.string().min(1, 'Country code is required.'),
-  phoneNumber: z.string().min(10, {
-    message: 'Phone number must be at least 10 digits inindia.'
+  phoneNumber: z.string().min(5, {
+    message: 'Please enter a valid phone number.'
   }),
 });
 
