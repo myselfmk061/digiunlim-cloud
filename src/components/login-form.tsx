@@ -4,7 +4,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cloud, Loader2, Phone, Send, ShieldCheck, ArrowLeft, Info } from 'lucide-react';
+import { Cloud, Loader2, Phone, Send, ShieldCheck, ArrowLeft, Info, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -27,7 +28,6 @@ import {
   SelectValue,
 } from './ui/select';
 import { ScrollArea } from './ui/scroll-area';
-import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 const FormSchema = z.object({
   countryCode: z.string().min(1, 'Country code is required.'),
@@ -68,11 +68,13 @@ const countryCodes = [
 
 
 export function LoginForm() {
-  const [step, setStep] = useState<'agreement' | 'form' | 'action_required'>('agreement');
+  const [step, setStep] = useState<'agreement' | 'form' | 'action_required' | 'verified'>('agreement');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [loginToken, setLoginToken] = useState<string | null>(null);
   const verificationBotUsername = process.env.NEXT_PUBLIC_VERIFICATION_BOT_USERNAME || 'your_bot_username';
+  const router = useRouter();
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -81,6 +83,61 @@ export function LoginForm() {
       phoneNumber: '',
     },
   });
+
+  // Effect to handle polling
+  useEffect(() => {
+    if (loginToken && step === 'action_required') {
+      pollingIntervalRef.current = setInterval(async () => {
+        try {
+          const response = await fetch(`/api/auth/status?token=${loginToken}`);
+          const data = await response.json();
+
+          if (data.status === 'VERIFIED') {
+            if (pollingIntervalRef.current) {
+              clearInterval(pollingIntervalRef.current);
+            }
+            localStorage.setItem('userPhoneNumber', data.phoneNumber);
+            localStorage.setItem('verificationToken', loginToken);
+            setStep('verified');
+            setTimeout(() => {
+              router.push('/dashboard?verified=true');
+            }, 2000);
+          } else if (data.status === 'EXPIRED') {
+             if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+             }
+             toast({
+                title: 'Link Expired',
+                description: 'The verification link has expired. Please try again.',
+                variant: 'destructive',
+             });
+             setStep('form');
+             setLoginToken(null);
+          }
+          // If status is 'PENDING', do nothing and continue polling.
+        } catch (error) {
+          console.error('Polling error:', error);
+           if (pollingIntervalRef.current) {
+              clearInterval(pollingIntervalRef.current);
+           }
+          toast({
+            title: 'Error',
+            description: 'Something went wrong during verification.',
+            variant: 'destructive',
+          });
+          setStep('form');
+          setLoginToken(null);
+        }
+      }, 2000); // Poll every 2 seconds
+    }
+
+    // Cleanup function
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [loginToken, step, router, toast]);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setIsLoading(true);
@@ -117,6 +174,19 @@ export function LoginForm() {
         setIsLoading(false);
     }
   }
+
+  if (step === 'verified') {
+    return (
+        <Card className="w-full max-w-md shadow-2xl">
+            <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
+                <CheckCircle2 className="h-12 w-12 text-green-500" />
+                <h1 className="text-xl font-semibold">Verification Successful!</h1>
+                <p className="text-muted-foreground">Redirecting to your dashboard...</p>
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </CardContent>
+        </Card>
+    );
+  }
   
   if (step === 'action_required') {
       const botLink = `https://t.me/${verificationBotUsername}?start=${loginToken}`;
@@ -128,7 +198,7 @@ export function LoginForm() {
                   </div>
                   <CardTitle className="text-2xl font-bold">Action Required</CardTitle>
                   <CardDescription>
-                      To complete your login, please click the button below to send the verification code to our Telegram bot.
+                      To complete your login, please click the button below to open Telegram and send the verification code to our bot.
                   </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -137,10 +207,14 @@ export function LoginForm() {
                         <Send className="mr-2 h-4 w-4" /> Verify on Telegram
                     </a>
                   </Button>
-                  <p className="text-xs text-center text-muted-foreground">
-                      After sending the code on Telegram, you will be automatically logged in here.
-                  </p>
+                  <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin"/>
+                    <p className="text-xs text-center">
+                        Waiting for verification...
+                    </p>
+                  </div>
                   <Button variant="outline" className="w-full" onClick={() => {
+                      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
                       setStep('form');
                       setLoginToken(null);
                   }}>
