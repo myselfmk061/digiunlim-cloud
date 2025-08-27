@@ -6,12 +6,12 @@ export async function POST(request: Request) {
   try {
     const { phoneNumber, countryCode } = await request.json();
     
-    const botToken = process.env.VERIFICATION_BOT_TOKEN;
-    const chatId = process.env.VERIFICATION_CHAT_ID;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002';
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002');
 
     if (!botToken || !chatId) {
-      console.error('VERIFICATION_BOT_TOKEN or VERIFICATION_CHAT_ID is not set.');
+      console.error('TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not set in environment variables.');
       return NextResponse.json(
         { error: 'Verification service is not configured. Please contact support.' },
         { status: 500 }
