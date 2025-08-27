@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cloud, Loader2, Phone, Send, AlertTriangle, ShieldCheck, ArrowLeft, Info } from 'lucide-react';
+import { Cloud, Loader2, Phone, Send, ShieldCheck, ArrowLeft, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -68,12 +68,11 @@ const countryCodes = [
 
 
 export function LoginForm() {
-  const [step, setStep] = useState<'agreement' | 'form' | 'sent'>('agreement');
+  const [step, setStep] = useState<'agreement' | 'form' | 'action_required'>('agreement');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const [errorState, setErrorState] = useState<{ message: string; showBotLink: boolean }>({ message: '', showBotLink: false });
-  const verificationBotUsername = process.env.NEXT_PUBLIC_VERIFICATION_BOT_USERNAME;
-
+  const [loginToken, setLoginToken] = useState<string | null>(null);
+  const verificationBotUsername = process.env.NEXT_PUBLIC_VERIFICATION_BOT_USERNAME || 'your_bot_username';
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -85,7 +84,6 @@ export function LoginForm() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setIsLoading(true);
-    setErrorState({ message: '', showBotLink: false });
 
     try {
         const response = await fetch('/api/auth/start', {
@@ -102,29 +100,17 @@ export function LoginForm() {
         const result = await response.json();
 
         if (!response.ok) {
-            const errorMessage = result.error || 'Failed to send verification link.';
-             if (response.status === 404 && errorMessage.includes('Could not send link')) {
-                setErrorState({ message: errorMessage, showBotLink: true });
-            } else {
-                 toast({
-                    title: 'Error',
-                    description: errorMessage,
-                    variant: 'destructive',
-                });
-            }
-            return;
+            throw new Error(result.error || 'Failed to start login process.');
         }
         
-        // Optional: If you want to do something with the returned token on the frontend,
-        // you can access it via `result.token`. For now, we just transition the UI.
-
-        setStep('sent');
+        setLoginToken(result.token);
+        setStep('action_required');
         
     } catch (error) {
         console.error(error);
         toast({
             title: 'Error',
-            description: error instanceof Error ? error.message : 'Could not send verification link. Please try again later.',
+            description: error instanceof Error ? error.message : 'Could not start login process. Please try again later.',
             variant: 'destructive',
         });
     } finally {
@@ -132,20 +118,32 @@ export function LoginForm() {
     }
   }
   
-  if (step === 'sent') {
+  if (step === 'action_required') {
+      const botLink = `https://t.me/${verificationBotUsername}?start=${loginToken}`;
       return (
           <Card className="w-full max-w-md shadow-2xl">
               <CardHeader className="text-center">
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                       <Send className="h-8 w-8 text-primary" />
                   </div>
-                  <CardTitle className="text-2xl font-bold">Check your Telegram</CardTitle>
+                  <CardTitle className="text-2xl font-bold">Action Required</CardTitle>
                   <CardDescription>
-                      A secure login link has been sent to your account. Please click the link to continue to your dashboard.
+                      To complete your login, please click the button below to send the verification code to our Telegram bot.
                   </CardDescription>
               </CardHeader>
-              <CardContent>
-                  <Button variant="outline" className="w-full" onClick={() => setStep('form')}>
+              <CardContent className="space-y-4">
+                  <Button className="w-full" asChild>
+                    <a href={botLink} target="_blank" rel="noopener noreferrer">
+                        <Send className="mr-2 h-4 w-4" /> Verify on Telegram
+                    </a>
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                      After sending the code on Telegram, you will be automatically logged in here.
+                  </p>
+                  <Button variant="outline" className="w-full" onClick={() => {
+                      setStep('form');
+                      setLoginToken(null);
+                  }}>
                       <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
                   </Button>
               </CardContent>
@@ -197,7 +195,7 @@ export function LoginForm() {
         </div>
         <CardTitle className="text-2xl font-bold">Welcome to DigiUnLim Cloud</CardTitle>
         <CardDescription>
-          Enter your phone number to receive a verification link on Telegram.
+          Enter your phone number to start the login process on Telegram.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -245,29 +243,10 @@ export function LoginForm() {
                 )}
               />
             </div>
-            {errorState.message && (
-                <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Action Required</AlertTitle>
-                    <AlertDescription>
-                        {errorState.message}
-                        {errorState.showBotLink && verificationBotUsername && (
-                             <Button
-                                variant="link"
-                                className="p-0 h-auto mt-2"
-                                asChild
-                            >
-                                <a href={`https://t.me/${verificationBotUsername}`} target="_blank" rel="noopener noreferrer">
-                                    Click here to start a chat with the bot.
-                                </a>
-                            </Button>
-                        )}
-                    </AlertDescription>
-                </Alert>
-            )}
+            
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? 'Sending Link...' : 'Send Verification Link'}
+              {isLoading ? 'Generating Code...' : 'Get Verification Code'}
             </Button>
             <Button variant="link" className="w-full text-muted-foreground" onClick={() => setStep('agreement')}>
               Back to Requirements
