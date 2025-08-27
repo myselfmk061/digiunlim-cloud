@@ -6,28 +6,69 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// Define the shape of the verification data from KV
+type AuthTokenData = {
+  status: 'PENDING' | 'VERIFIED' | 'EXPIRED';
+  phoneNumber: string;
+  createdAt: number;
+  expiresAt: number;
+};
+
 export default function VerifyPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [errorMessage, setErrorMessage] = useState('This verification link is invalid or expired.');
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const token = searchParams.get('token');
-    const phone = searchParams.get('phone');
-
-    if (!token || !phone) {
+    
+    if (!token) {
       setStatus('error');
+      setErrorMessage('No verification token found in the link.');
       return;
     }
 
-    localStorage.setItem('userPhoneNumber', decodeURIComponent(phone));
-    localStorage.setItem('verificationToken', token);
-    
-    setStatus('success');
-    
-    setTimeout(() => {
-      router.push('/dashboard?verified=true');
-    }, 2000);
+    const verifyToken = async () => {
+      try {
+        const response = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Verification failed.');
+        }
+
+        // On successful verification, the API returns the phone number
+        const phoneNumber = result.phoneNumber;
+        if (!phoneNumber) {
+             throw new Error('Verification data is incomplete.');
+        }
+        
+        // Store user info and redirect
+        localStorage.setItem('userPhoneNumber', phoneNumber);
+        localStorage.setItem('verificationToken', token); // Still useful for session validation
+        
+        setStatus('success');
+        
+        setTimeout(() => {
+          router.push('/dashboard?verified=true');
+        }, 2000);
+
+      } catch (error) {
+        setStatus('error');
+        if (error instanceof Error) {
+            setErrorMessage(error.message);
+        }
+        console.error('Verification error:', error);
+      }
+    };
+
+    verifyToken();
   }, [searchParams, router]);
 
   if (status === 'loading') {
@@ -49,8 +90,8 @@ export default function VerifyPage() {
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
             <XCircle className="h-12 w-12 text-red-500" />
-            <h1 className="text-xl font-semibold">Invalid Link</h1>
-            <p className="text-muted-foreground">This verification link is invalid or expired.</p>
+            <h1 className="text-xl font-semibold">Verification Failed</h1>
+            <p className="text-muted-foreground">{errorMessage}</p>
             <Button onClick={() => router.push('/login')}>Back to Login</Button>
           </CardContent>
         </Card>

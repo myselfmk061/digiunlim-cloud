@@ -88,7 +88,7 @@ export function LoginForm() {
     setErrorState({ message: '', showBotLink: false });
 
     try {
-        const response = await fetch('/api/send-verification', {
+        const response = await fetch('/api/auth/start', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -99,14 +99,10 @@ export function LoginForm() {
             }),
         });
 
+        const result = await response.json();
+
         if (!response.ok) {
-            let errorResult;
-            try {
-                errorResult = await response.json();
-            } catch {
-                throw new Error(`Server error: ${response.status}`);
-            }
-            const errorMessage = errorResult.error || 'Failed to send verification link.';
+            const errorMessage = result.error || 'Failed to send verification link.';
              if (response.status === 404 && errorMessage.includes('Could not send link')) {
                 setErrorState({ message: errorMessage, showBotLink: true });
             } else {
@@ -118,10 +114,10 @@ export function LoginForm() {
             }
             return;
         }
-
-        const fullPhoneNumber = `${data.countryCode}${data.phoneNumber}`;
-        localStorage.setItem('userPhoneNumber', fullPhoneNumber);
         
+        // Optional: If you want to do something with the returned token on the frontend,
+        // you can access it via `result.token`. For now, we just transition the UI.
+
         setStep('sent');
         
     } catch (error) {
