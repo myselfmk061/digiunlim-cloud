@@ -41,12 +41,12 @@ export default function TermsOfServicePage() {
                     <p>You agree to use our service for lawful purposes only and in a manner that does not infringe the rights of, or restrict or inhibit the use and enjoyment of, this service by any third party. Prohibited behavior includes harassing or causing distress or inconvenience to any person, transmitting obscene or offensive content, or disrupting the normal flow of dialogue within our service.</p>
                 </section>
                 <section>
-                    <h2 className="text-xl font-semibold text-foreground mb-2">3. User Accounts</h2>
-                    <p>To use certain features of our service, you may be required to create an account. You are responsible for maintaining the confidentiality of your account information and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.</p>
+                    <h2 className="text-xl font-semibold text-foreground mb-2">3. User Accounts & Data Storage</h2>
+                    <p>To use certain features of our service, you may be required to create an account using your Telegram identity. You are responsible for all activities that occur under your account. The files you upload are stored directly on Telegram's secure cloud infrastructure. DigiUnLim Cloud provides an interface to this storage but does not store your files on its own servers. As such, the safety, privacy, and security of your files are subject to Telegram's own policies and robust security measures.</p>
                 </section>
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">4. Intellectual Property</h2>
-                    <p>All content included on this service, such as text, graphics, logos, images, as well as the compilation thereof, and any software used on the site, is the property of DigiUnLim Cloud or its suppliers and protected by copyright and other laws.</p>
+                    <p>All content included on this service, such as text, graphics, logos, images, as well as the compilation thereof, and any software used on the site, is the property of DigiUnLim Cloud or its suppliers and protected by copyright and other laws. You retain all ownership rights to the files you upload.</p>
                 </section>
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">5. Termination</h2>
@@ -54,7 +54,7 @@ export default function TermsOfServicePage() {
                 </section>
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">6. Limitation of Liability</h2>
-                    <p>In no event shall DigiUnLim Cloud, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.</p>
+                    <p>In no event shall DigiUnLim Cloud, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service. Since files are stored on Telegram's platform, we are not liable for data loss or security breaches that may occur on Telegram's end.</p>
                 </section>
                  <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">7. Governing Law</h2>

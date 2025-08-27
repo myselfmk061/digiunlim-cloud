@@ -42,7 +42,7 @@ export default function PrivacyPolicyPage() {
                     <p className="mt-2">The personal information that we collect depends on the context of your interactions with us and the Services, the choices you make and the products and features you use. The personal information we collect may include the following:</p>
                     <ul className="list-disc list-inside mt-2 space-y-1">
                         <li><strong>Personal Information Provided by You.</strong> We collect phone numbers; names; email addresses; and other similar data.</li>
-                        <li><strong>Files.</strong> We collect and store the files you upload, download, or access with the Services.</li>
+                        <li><strong>Files.</strong> We collect and store the files you upload, download, or access with the Services. These files are stored directly on Telegram's secure cloud infrastructure.</li>
                     </ul>
                 </section>
                 <section>
@@ -65,8 +65,9 @@ export default function PrivacyPolicyPage() {
                     <p className="mt-2">Specifically, we may need to process your data or share your personal information in the following situations: Business Transfers. We may share or transfer your information in connection with, or during negotiations of, any merger, sale of company assets, financing, or acquisition of all or a portion of our business to another company.</p>
                 </section>
                  <section>
-                    <h2 className="text-xl font-semibold text-foreground mb-2">5. Data Security</h2>
-                    <p>We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. We leverage the robust security infrastructure of Telegram to protect your files. However, despite our safeguards and efforts to secure your information, no electronic transmission over the Internet or information storage technology can be guaranteed to be 100% secure, so we cannot promise or guarantee that hackers, cybercriminals, or other unauthorized third parties will not be able to defeat our security, and improperly collect, access, steal, or modify your information.</p>
+                    <h2 className="text-xl font-semibold text-foreground mb-2">5. Data Security and Storage</h2>
+                    <p>We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. Our service's core architecture is built upon Telegram's robust and secure infrastructure. When you upload a file, it is transferred directly to Telegram's encrypted cloud storage. DigiUnLim Cloud acts as an interface to this storage, meaning your files benefit from the world-class security and privacy protections provided by Telegram.</p>
+                    <p className="mt-2">However, despite our safeguards and efforts to secure your information, no electronic transmission over the Internet or information storage technology can be guaranteed to be 100% secure, so we cannot promise or guarantee that hackers, cybercriminals, or other unauthorized third parties will not be able to defeat our security, and improperly collect, access, steal, or modify your information.</p>
                 </section>
                 <section>
                     <h2 className="text-xl font-semibold text-foreground mb-2">6. Your Privacy Rights</h2>
