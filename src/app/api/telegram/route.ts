@@ -14,9 +14,9 @@ function getStorageBotToken() {
 }
 
 function getChatId() {
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const chatId = process.env.VERIFICATION_CHAT_ID;
     if (!chatId) {
-        console.error('TELEGRAM_CHAT_ID is not set.');
+        console.error('VERIFICATION_CHAT_ID is not set.');
         throw new Error('Storage service is not configured. Please contact support.');
     }
     return chatId;

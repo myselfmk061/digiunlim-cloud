@@ -1,6 +1,5 @@
 
 import type {NextConfig} from 'next';
-import 'dotenv/config';
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -26,9 +25,8 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    serverComponentsExternalPackages: ['sharp'],
+    optimizePackageImports: ['lucide-react'],
   },
-  output: 'standalone',
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
