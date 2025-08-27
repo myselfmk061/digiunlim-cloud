@@ -1,6 +1,6 @@
 
 import type {NextConfig} from 'next';
-// import 'dotenv/config' // Not needed in Vercel
+import 'dotenv/config';
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -26,10 +26,9 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    serverComponentsExternalPackages: ['sharp'],
   },
-  serverExternalPackages: ['sharp'],
-  // output: 'standalone', // Remove for Vercel
+  output: 'standalone',
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
