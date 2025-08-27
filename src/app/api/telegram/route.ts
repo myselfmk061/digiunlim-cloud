@@ -1,15 +1,32 @@
+
 // src/app/api/telegram/route.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { AppFile } from '@/types';
 
-const BOT_TOKEN = process.env.STORAGE_BOT_TOKEN;
-const CHAT_ID = process.env.STORAGE_CHAT_ID;
-const API_BASE_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+function getStorageBotToken() {
+    const token = process.env.STORAGE_BOT_TOKEN;
+    if (!token) {
+        console.error('STORAGE_BOT_TOKEN is not set in .env file.');
+        // This will be caught by the calling functions and returned as a proper error response.
+        throw new Error('Storage bot is not configured.');
+    }
+    return token;
+}
+
+function getStorageChatId() {
+    const chatId = process.env.STORAGE_CHAT_ID;
+    if (!chatId) {
+        console.error('STORAGE_CHAT_ID is not set in .env file.');
+        throw new Error('Storage chat is not configured.');
+    }
+    return chatId;
+}
 
 // Helper to get file info from Telegram
 async function getFileInfo(fileId: string) {
-    const response = await fetch(`${API_BASE_URL}/getFile?file_id=${fileId}`);
+    const botToken = getStorageBotToken();
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`);
     const result = await response.json();
     if (!result.ok) {
         throw new Error(`Failed to get file info: ${result.description}`);
@@ -18,11 +35,11 @@ async function getFileInfo(fileId: string) {
 }
 
 export async function POST(request: NextRequest) {
-    if (!BOT_TOKEN || !CHAT_ID) {
-        return NextResponse.json({ error: 'Telegram storage bot not configured.' }, { status: 500 });
-    }
-
     try {
+        const botToken = getStorageBotToken();
+        const chatId = getStorageChatId();
+        const apiBaseUrl = `https://api.telegram.org/bot${botToken}`;
+
         const formData = await request.formData();
         const file = formData.get('file') as File;
 
@@ -31,10 +48,10 @@ export async function POST(request: NextRequest) {
         }
 
         const uploadFormData = new FormData();
-        uploadFormData.append('chat_id', CHAT_ID);
+        uploadFormData.append('chat_id', chatId);
         uploadFormData.append('document', file);
 
-        const response = await fetch(`${API_BASE_URL}/sendDocument`, {
+        const response = await fetch(`${apiBaseUrl}/sendDocument`, {
             method: 'POST',
             body: uploadFormData,
         });
@@ -68,23 +85,21 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-    if (!BOT_TOKEN || !CHAT_ID) {
-        return NextResponse.json({ error: 'Telegram storage bot not configured.' }, { status: 500 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const fileId = searchParams.get('fileId');
-
-    if (!fileId) {
-        return NextResponse.json({ error: 'File ID is required' }, { status: 400 });
-    }
-
     try {
+        const botToken = getStorageBotToken();
+        const { searchParams } = new URL(request.url);
+        const fileId = searchParams.get('fileId');
+
+        if (!fileId) {
+            return NextResponse.json({ error: 'File ID is required' }, { status: 400 });
+        }
+
         const fileInfo = await getFileInfo(fileId);
-        const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileInfo.file_path}`;
+        const fileUrl = `https://api.telegram.org/file/bot${botToken}/${fileInfo.file_path}`;
         
         // Redirect to the actual file URL
         return NextResponse.redirect(fileUrl);
+
     } catch (error) {
         console.error('Download Error:', error);
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -93,19 +108,19 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-    if (!BOT_TOKEN || !CHAT_ID) {
-        return NextResponse.json({ error: 'Telegram storage bot not configured.' }, { status: 500 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const messageId = searchParams.get('messageId');
-
-    if (!messageId) {
-        return NextResponse.json({ error: 'Message ID is required for deletion' }, { status: 400 });
-    }
-
     try {
-        const response = await fetch(`${API_BASE_URL}/deleteMessage?chat_id=${CHAT_ID}&message_id=${messageId}`);
+        const botToken = getStorageBotToken();
+        const chatId = getStorageChatId();
+        const apiBaseUrl = `https://api.telegram.org/bot${botToken}`;
+
+        const { searchParams } = new URL(request.url);
+        const messageId = searchParams.get('messageId');
+
+        if (!messageId) {
+            return NextResponse.json({ error: 'Message ID is required for deletion' }, { status: 400 });
+        }
+
+        const response = await fetch(`${apiBaseUrl}/deleteMessage?chat_id=${chatId}&message_id=${messageId}`);
         const result = await response.json();
 
         if (!result.ok) {

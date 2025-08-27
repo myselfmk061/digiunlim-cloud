@@ -1,3 +1,4 @@
+
 // src/app/api/send-verification/route.ts
 import { NextResponse } from 'next/server';
 
@@ -11,9 +12,9 @@ export async function POST(request: Request) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
 
     if (!botToken || !chatId) {
-      console.error('VERIFICATION_BOT_TOKEN or VERIFICATION_CHAT_ID is not set.');
+      console.error('VERIFICATION_BOT_TOKEN or VERIFICATION_CHAT_ID is not set in .env file.');
       // In a real app, you might want to return a more generic error message.
-      // For this example, we'll proceed to simulate success for the frontend.
+      // For this example, we'll simulate success for the frontend.
       // throw new Error('Server configuration error.');
 
       // Simulating success for UI flow even if backend isn't fully configured
