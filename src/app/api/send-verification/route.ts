@@ -16,9 +16,8 @@ export async function POST(request: Request) {
     }
     
     const botToken = process.env.VERIFICATION_BOT_TOKEN;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-       process.env.NODE_ENV === 'production' ? 'https://your-app.vercel.app' : 'http://localhost:9002');
+    // Use NEXT_PUBLIC_APP_URL as the single source of truth, with a fallback for local development.
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
 
     if (!botToken) {
       console.error('VERIFICATION_BOT_TOKEN is not set.');
@@ -28,6 +27,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // This token is just a placeholder for link uniqueness, not for security.
     const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
     const fullPhoneNumber = countryCode + phoneNumber;
     const verificationLink = `${appUrl}/verify?token=${token}&phone=${encodeURIComponent(fullPhoneNumber)}`;
@@ -35,15 +35,13 @@ export async function POST(request: Request) {
     
     const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
-    // The chat_id for sending the message will be the user's phone number (including country code).
-    // The user must have started a chat with the bot for this to work.
     const response = await fetch(telegramApiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            chat_id: fullPhoneNumber,
+            chat_id: fullPhoneNumber, // Send to the user's phone number
             text: message,
         }),
     });
@@ -52,8 +50,7 @@ export async function POST(request: Request) {
 
     if (!result.ok) {
         console.error('Failed to send Telegram message:', result.description);
-        // Provide a more helpful error message to the user
-        if (result.description && result.description.includes('chat not found')) {
+        if (result.description && (result.description.includes('chat not found') || result.description.includes('bot was blocked by the user'))) {
              return NextResponse.json(
                 { error: 'Could not send link. Make sure this phone number is on Telegram and you have started a chat with our bot.' },
                 { status: 404 }

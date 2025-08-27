@@ -70,7 +70,8 @@ After deploying, Vercel will show you a congratulations screen with a picture of
 4.  Click on **Environment Variables** in the left menu.
 5.  Add one more variable:
     *   **Name:** `NEXT_PUBLIC_APP_URL`
-    *   **Value:** Paste the URL you copied.
-6.  **Save** the new variable. Vercel will automatically start a new deployment.
+    *   **Value:** Paste the URL you copied (e.g., `https://your-project.vercel.app`).
+6.  **Save** the new variable.
+7.  Go to the **Deployments** tab and redeploy your project for the change to take effect.
 
 You are all done! Your website is now live and fully configured.
