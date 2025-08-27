@@ -1,76 +1,50 @@
-// src/app/api/bot/webhook/route.ts
 import { NextResponse, type NextRequest } from 'next/server';
 import { redis } from '@/lib/redis';
 
-type AuthTokenData = {
-  status: 'PENDING' | 'VERIFIED' | 'EXPIRED';
-  phoneNumber: string;
-  createdAt: number;
-  expiresAt: number;
-};
-
-// This function handles incoming webhooks from Telegram
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // 1. Check if the update contains a message and text
+    
+    // Check for message and text field
     if (!body.message || !body.message.text) {
-      return NextResponse.json({ status: 'ok' }); // Not an event we care about
+      // Not a message we are interested in, so we can ignore it.
+      return NextResponse.json({ ok: true });
     }
 
-    const text: string = body.message.text;
+    const { message } = body;
     
-    // 2. Check if the message is a /start command with a token
-    if (!text.startsWith('/start ')) {
-      return NextResponse.json({ status: 'ok' }); // Not a login attempt
+    // The token is sent with the /start command, e.g., /start <token>
+    const parts = message.text.split(' ');
+    if (parts.length < 2 || parts[0] !== '/start') {
+        // Command is not in the format we expect
+        return NextResponse.json({ ok: true });
     }
-
-    const token = text.split(' ')[1];
-    if (!token) {
-      console.warn('Webhook received /start command without a token.');
-      return NextResponse.json({ status: 'ok' });
-    }
-
-    const key = `auth:${token}`;
-    const data = await redis.get<string>(key);
-
-    // 3. Validate the token
-    if (!data) {
-      console.warn(`Webhook received an invalid token: ${token}`);
-      // We don't need to send a message back, just acknowledge the webhook.
-      return NextResponse.json({ status: 'ok' });
-    }
-
-    const tokenData: AuthTokenData = JSON.parse(data);
-
-    if (Date.now() > tokenData.expiresAt) {
-       console.warn(`Webhook received an expired token: ${token}`);
-       return NextResponse.json({ status: 'ok' });
-    }
-
-    if (tokenData.status === 'PENDING') {
-      // 4. Update the status to 'VERIFIED'
+    const token = parts[1];
+    
+    const key = `login-token:${token}`;
+    const tokenDataString = await redis.get<string>(key);
+    
+    if (tokenDataString) {
+      const tokenData = JSON.parse(tokenDataString);
+      
+      // Update status to VERIFIED
       const updatedTokenData = { ...tokenData, status: 'VERIFIED' };
-      await redis.set(key, JSON.stringify(updatedTokenData), { 
-        ex: 60 * 60 * 24 // Keep record for 24 hours
-      });
+      
+      // Save it back to redis with the original expiration time
+      const ttl = await redis.ttl(key);
+      await redis.set(
+        key,
+        JSON.stringify(updatedTokenData),
+        { ex: ttl > 0 ? ttl : 600 } // use remaining ttl or default to 10 mins
+      );
     }
-    
-    // 5. Acknowledge the webhook request from Telegram
-    return NextResponse.json({ status: 'ok' });
+    // Always return OK to Telegram
+    return NextResponse.json({ ok: true });
 
   } catch (error) {
-    console.error('Error in /api/bot/webhook:', error);
-    // Return a 200 OK response even on errors to prevent Telegram from resending the webhook
-    return NextResponse.json({ status: 'error', message: 'Internal server error' });
+    console.error("Error in webhook:", error);
+    // Even if there's an error, we should tell Telegram we received the request.
+    // The error is logged for debugging.
+    return NextResponse.json({ ok: true });
   }
 }
-
-// NOTE: You must set this webhook with Telegram for it to work.
-// You can do this by sending a request to the Telegram API:
-// https://api.telegram.org/bot<YOUR_VERIFICATION_BOT_TOKEN>/setWebhook?url=<YOUR_DEPLOYED_APP_URL>/api/bot/webhook
-// Example:
-// curl "https://api.telegram.org/bot12345:ABCDE/setWebhook?url=https://your-app.vercel.app/api/bot/webhook"
-//
-// Do this ONCE after your application is deployed.

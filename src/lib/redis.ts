@@ -1,11 +1,14 @@
-import 'dotenv/config';
 import { Redis } from '@upstash/redis';
 
-if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-  throw new Error('Upstash Redis credentials are not set in environment variables.');
+function getRedisClient() {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  
+  if (!url || !token) {
+    throw new Error('Upstash Redis credentials are not configured in environment variables.');
+  }
+  
+  return new Redis({ url, token });
 }
 
-export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+export const redis = getRedisClient();

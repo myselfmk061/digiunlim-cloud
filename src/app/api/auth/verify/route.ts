@@ -18,27 +18,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Verification token is required.' }, { status: 400 });
     }
 
-    const key = `auth:${token}`;
+    const key = `login-token:${token}`;
     const data = await redis.get<string>(key);
 
     if (!data) {
       return NextResponse.json({ error: 'This verification link is invalid or has already been used.' }, { status: 404 });
     }
 
-    const tokenData: AuthTokenData = JSON.parse(data);
+    const tokenData = JSON.parse(data);
 
     if (tokenData.status === 'VERIFIED') {
       return NextResponse.json({ error: 'This link has already been used.' }, { status: 410 });
     }
     
-    if (Date.now() > tokenData.expiresAt) {
-      return NextResponse.json({ error: 'This verification link has expired. Please request a new one.' }, { status: 410 });
-    }
-
     // Update the status to 'VERIFIED' and re-save it.
     const updatedTokenData = { ...tokenData, status: 'VERIFIED' };
     await redis.set(key, JSON.stringify(updatedTokenData), {
-        ex: 60 * 60 * 24 // Keep record for 24 hours for auditing, then delete
+        // Keep it for the original expiry duration
+        pxat: tokenData.expiresAt || Date.now() + 10 * 60 * 1000
     });
 
 

@@ -1,45 +1,36 @@
-// src/app/api/auth/start/route.ts
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { redis } from '@/lib/redis';
-import { randomUUID } from 'crypto';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { phoneNumber, countryCode } = body;
-
-    if (!phoneNumber || !countryCode) {
-      return NextResponse.json(
-        { error: 'Phone number and country code are required.' },
-        { status: 400 }
-      );
+    const { countryCode, phoneNumber: rawPhoneNumber } = await request.json();
+    
+    if (!rawPhoneNumber) {
+        return NextResponse.json({ error: 'Phone number is required.' }, { status: 400 });
     }
+    
+    // Clean phone number (remove non-digits) and combine with country code
+    const phoneNumber = `${countryCode}${rawPhoneNumber.replace(/\D/g, '')}`;
 
-    // 1. Create a secure, unique token
-    const token = randomUUID();
-    const fullPhoneNumber = countryCode + phoneNumber;
+    const loginToken = crypto.randomUUID();
+    const verificationToken = crypto.randomUUID(); // For the link
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes from now
 
-    // 2. Store the token in Upstash Redis
-    const key = `auth:${token}`;
-    const value = {
-        status: 'PENDING',
-        phoneNumber: fullPhoneNumber,
-        createdAt: Date.now(),
-        expiresAt: expiresAt,
-    };
+    // Store login token info for polling
+    await redis.set(
+      `login-token:${loginToken}`,
+      JSON.stringify({ status: 'PENDING', phoneNumber: phoneNumber }), // Include phone number for later
+      { ex: 600 } // 10 minute expiry
+    );
     
-    await redis.set(key, JSON.stringify(value), {
-      ex: 600 // Expire key in Redis after 10 minutes
-    });
-
-
-    // 3. Send the token back to the frontend
-    return NextResponse.json({ token });
+    return NextResponse.json({ token: loginToken });
 
   } catch (error) {
-    console.error('Error in /api/auth/start:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return NextResponse.json({ error: 'An internal server error occurred.', details: errorMessage }, { status: 500 });
+    console.error('Error creating login token:', error);
+    return NextResponse.json(
+      { error: 'Could not start login process' },
+      { status: 500 }
+    );
   }
 }
