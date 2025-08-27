@@ -31,8 +31,8 @@ import { ScrollArea } from './ui/scroll-area';
 
 const FormSchema = z.object({
   countryCode: z.string().min(1, 'Country code is required.'),
-  phoneNumber: z.string().min(8, {
-    message: 'Phone number must be at least 8 digits.',
+  phoneNumber: z.string().min(10, {
+    message: 'Phone number must be at least 10 digits inindia.'
   }),
 });
 
@@ -148,6 +148,21 @@ export function LoginForm() {
         <CardDescription>
           Enter your phone number to receive a verification link on Telegram.
         </CardDescription>
+        <div className="mt-4 rounded-lg bg-blue-50 p-4 text-sm text-left">
+          <h3 className="font-semibold text-blue-900 mb-2">📋 Requirements:</h3>
+          <ul className="space-y-1 text-blue-800 list-disc list-inside">
+            <li>An active Telegram account.</li>
+            <li>The phone number must be linked to your Telegram.</li>
+          </ul>
+        </div>
+        <div className="mt-3 rounded-lg bg-amber-50 p-4 text-sm text-left">
+          <h3 className="font-semibold text-amber-900 mb-2">⚠️ Important:</h3>
+          <ul className="space-y-1 text-amber-800 list-disc list-inside">
+            <li>You must have started a conversation with our bot on Telegram before you can receive the link.</li>
+            <li>Check your Telegram messages for the verification link.</li>
+            <li>The link expires in 10 minutes.</li>
+          </ul>
+        </div>
       </CardHeader>
       <CardContent>
         <Form {...form}>
