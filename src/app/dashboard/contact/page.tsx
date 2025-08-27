@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Cloud, Loader2, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Footer } from '@/components/footer';
 
 const FormSchema = z.object({
   name: z.string().min(2, {
@@ -149,6 +150,7 @@ export default function ContactPage() {
             </CardContent>
         </Card>
       </main>
+      <Footer />
     </div>
   );
 }

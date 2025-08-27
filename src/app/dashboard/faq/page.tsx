@@ -9,6 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Footer } from '@/components/footer';
 
 const faqItems = [
     {
@@ -76,6 +77,7 @@ export default function FAQPage() {
             </CardContent>
         </Card>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -25,6 +25,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Footer } from '@/components/footer';
 
 export default function SettingsPage() {
     const [isStorageClaimed, setIsStorageClaimed] = useState(false);
@@ -220,6 +221,7 @@ export default function SettingsPage() {
           </Card>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

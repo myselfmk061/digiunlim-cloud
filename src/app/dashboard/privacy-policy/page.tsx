@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { Cloud, FileText } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Footer } from '@/components/footer';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -82,6 +83,7 @@ export default function PrivacyPolicyPage() {
             </CardContent>
         </Card>
       </main>
+      <Footer />
     </div>
   );
 }
