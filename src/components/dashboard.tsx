@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, ChangeEvent, useEffect } from 'react';
+import { useState, useRef, ChangeEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -53,7 +53,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export function Dashboard() {
+
+function DashboardLoading() {
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="mt-4">Loading Dashboard...</p>
+        </div>
+    )
+}
+
+function DashboardContent() {
   const [files, setFiles] = useState<AppFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -501,4 +511,13 @@ export function Dashboard() {
       </Dialog>
     </div>
   );
+}
+
+
+export function Dashboard() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardContent />
+    </Suspense>
+  )
 }
