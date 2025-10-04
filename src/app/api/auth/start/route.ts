@@ -1,7 +1,13 @@
 
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { redis } from '@/lib/redis';
+import { Redis } from '@upstash/redis';
+
+// Upstash Redis client को Initialize करें
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
 function generateOtp() {
   // Generate a 6-digit OTP
