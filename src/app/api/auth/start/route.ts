@@ -5,8 +5,8 @@ import { Redis } from '@upstash/redis';
 
 // Upstash Redis client को Initialize करें
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  url: process.env.UPSTASH_REDIS_REST_URL || 'https://helped-caiman-18817.upstash.io',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || 'AkmBAAIgcDIDbCxlSD38VKunHEfs6p4i9QW_6JHufFRarIh5b0VvgQ',
 });
 
 
@@ -49,11 +49,21 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error('❌ Error in login process:', error);
+    
+    // Check if it's a Redis connection error
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    if (errorMessage.includes('Redis') || errorMessage.includes('ECONNREFUSED')) {
+      return NextResponse.json(
+        { error: 'Database connection failed. Please try again later.' },
+        { status: 503 }
+      );
+    }
+    
     return NextResponse.json(
       { 
-        success: false,
-        error: 'Simple error for testing',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: 'Login process failed',
+        details: errorMessage
       },
       { status: 500 }
     );
