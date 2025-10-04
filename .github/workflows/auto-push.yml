@@ -1,0 +1,26 @@
+name: Auto Push to GitHub
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  auto-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Git
+      run: |
+        git config --global user.name "myselfmk061"
+        git config --global user.email "myselfmk061@users.noreply.github.com"
+    
+    - name: Auto Push
+      run: |
+        git add .
+        git commit -m "Auto push: $(date)" || exit 0
+        git push origin main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
