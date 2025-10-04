@@ -36,6 +36,11 @@ const FormSchema = z.object({
   }),
 });
 
+const OtpSchema = z.object({
+  otp: z.string().length(6, 'OTP must be 6 digits.'),
+});
+
+
 const countryCodes = [
     { value: '+91', label: '🇮🇳 +91' },
     { value: '+1', label: '🇺🇸 +1' },
@@ -68,10 +73,11 @@ const countryCodes = [
 
 
 export function LoginForm() {
-  const [step, setStep] = useState<'agreement' | 'form' | 'action_required' | 'verified'>('agreement');
+  const [step, setStep] = useState<'agreement' | 'form' | 'action_required' | 'otp' | 'verified'>('agreement');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [loginToken, setLoginToken] = useState<string | null>(null);
+  const [currentPhoneNumber, setCurrentPhoneNumber] = useState<string | null>(null);
   const verificationBotUsername = process.env.NEXT_PUBLIC_VERIFICATION_BOT_USERNAME || 'your_bot_username';
   const router = useRouter();
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -84,7 +90,15 @@ export function LoginForm() {
     },
   });
 
-  // Effect to handle polling
+  const otpForm = useForm<z.infer<typeof OtpSchema>>({
+    resolver: zodResolver(OtpSchema),
+    defaultValues: {
+      otp: '',
+    },
+  });
+
+
+  // Effect to handle polling for Telegram bot interaction
   useEffect(() => {
     if (loginToken && step === 'action_required') {
       pollingIntervalRef.current = setInterval(async () => {
@@ -92,16 +106,15 @@ export function LoginForm() {
           const response = await fetch(`/api/auth/status?token=${loginToken}`);
           const data = await response.json();
 
-          if (data.status === 'VERIFIED') {
+          if (data.status === 'OTP_SENT') {
             if (pollingIntervalRef.current) {
               clearInterval(pollingIntervalRef.current);
             }
-            localStorage.setItem('userPhoneNumber', data.phoneNumber);
-            localStorage.setItem('verificationToken', loginToken);
-            setStep('verified');
-            setTimeout(() => {
-              router.push('/dashboard?verified=true');
-            }, 2000);
+            toast({
+              title: 'OTP Sent!',
+              description: 'Please check your Telegram messages for the OTP.',
+            });
+            setStep('otp');
           } else if (data.status === 'EXPIRED') {
              if (pollingIntervalRef.current) {
                 clearInterval(pollingIntervalRef.current);
@@ -139,7 +152,7 @@ export function LoginForm() {
     };
   }, [loginToken, step, router, toast]);
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onPhoneSubmit(data: z.infer<typeof FormSchema>) {
     setIsLoading(true);
 
     try {
@@ -161,6 +174,7 @@ export function LoginForm() {
         }
         
         setLoginToken(result.token);
+        setCurrentPhoneNumber(result.phoneNumber);
         setStep('action_required');
         
     } catch (error) {
@@ -172,6 +186,38 @@ export function LoginForm() {
         });
     } finally {
         setIsLoading(false);
+    }
+  }
+
+  async function onOtpSubmit(data: z.infer<typeof OtpSchema>) {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: loginToken, otp: data.otp }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'OTP verification failed.');
+      }
+
+      localStorage.setItem('userPhoneNumber', result.phoneNumber);
+      setStep('verified');
+      setTimeout(() => {
+        router.push('/dashboard?verified=true');
+      }, 2000);
+
+    } catch (error) {
+      toast({
+        title: 'Verification Failed',
+        description: error instanceof Error ? error.message : 'An unknown error occurred.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -187,6 +233,48 @@ export function LoginForm() {
         </Card>
     );
   }
+
+  if (step === 'otp') {
+    return (
+       <Card className="w-full max-w-md shadow-2xl">
+        <CardHeader className="text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                <ShieldCheck className="h-8 w-8 text-primary" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Enter Verification Code</CardTitle>
+            <CardDescription>
+                A 6-digit OTP has been sent to your Telegram account.
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Form {...otpForm}>
+                <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-6">
+                    <FormField
+                        control={otpForm.control}
+                        name="otp"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>One-Time Password</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="123456" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {isLoading ? 'Verifying...' : 'Verify OTP'}
+                    </Button>
+                     <Button variant="link" className="w-full text-muted-foreground" onClick={() => setStep('action_required')}>
+                        Didn't get a code?
+                    </Button>
+                </form>
+            </Form>
+        </CardContent>
+       </Card>
+    )
+  }
   
   if (step === 'action_required') {
       const botLink = `https://t.me/${verificationBotUsername}?start=${loginToken}`;
@@ -196,21 +284,21 @@ export function LoginForm() {
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                       <Send className="h-8 w-8 text-primary" />
                   </div>
-                  <CardTitle className="text-2xl font-bold">Action Required</CardTitle>
+                  <CardTitle className="text-2xl font-bold">Start a Chat on Telegram</CardTitle>
                   <CardDescription>
-                      To complete your login, please click the button below to open Telegram and send the verification code to our bot.
+                      Click the button below to open Telegram and press "Start" to receive your OTP.
                   </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                   <Button className="w-full" asChild>
                     <a href={botLink} target="_blank" rel="noopener noreferrer">
-                        <Send className="mr-2 h-4 w-4" /> Verify on Telegram
+                        <Send className="mr-2 h-4 w-4" /> Open Telegram
                     </a>
                   </Button>
                   <div className="flex items-center justify-center gap-2 text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin"/>
                     <p className="text-xs text-center">
-                        Waiting for verification...
+                        Waiting for you to start the chat...
                     </p>
                   </div>
                   <Button variant="outline" className="w-full" onClick={() => {
@@ -245,16 +333,9 @@ export function LoginForm() {
                         <li>The phone number must be linked to your Telegram.</li>
                     </ul>
                 </div>
-                <div className="rounded-lg bg-amber-50 p-4 text-sm text-left dark:bg-amber-900/20">
-                    <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">⚠️ Important:</h3>
-                    <ul className="space-y-1 text-amber-800 dark:text-amber-300 list-disc list-inside">
-                        <li>You must start a chat with our bot on Telegram before you can receive the link.</li>
-                        <li>Check your Telegram messages for the verification link.</li>
-                        <li>The link expires in 10 minutes.</li>
-                    </ul>
-                </div>
+                
                 <Button className="w-full" onClick={() => setStep('form')}>
-                    <ShieldCheck className="mr-2 h-4 w-4" /> I Agree, Continue
+                    <ShieldCheck className="mr-2 h-4 w-4" /> I Understand, Continue
                 </Button>
             </CardContent>
         </Card>
@@ -269,12 +350,12 @@ export function LoginForm() {
         </div>
         <CardTitle className="text-2xl font-bold">Welcome to DigiUnLim Cloud</CardTitle>
         <CardDescription>
-          Enter your phone number to start the login process on Telegram.
+          Enter your phone number to receive a verification code on Telegram.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onPhoneSubmit)} className="space-y-6">
             <div className="flex gap-2">
               <FormField
                 control={form.control}
@@ -320,7 +401,7 @@ export function LoginForm() {
             
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? 'Generating Code...' : 'Get Verification Code'}
+              {isLoading ? 'Sending...' : 'Send Verification Code'}
             </Button>
             <Button variant="link" className="w-full text-muted-foreground" onClick={() => setStep('agreement')}>
               Back to Requirements
