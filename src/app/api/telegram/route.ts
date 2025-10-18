@@ -50,45 +50,51 @@ export async function POST(request: NextRequest) {
         uploadFormData.append('chat_id', chatId);
         uploadFormData.append('document', file);
 
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+
         const response = await fetch(`${apiBaseUrl}/sendDocument`, {
             method: 'POST',
             body: uploadFormData,
+            signal: controller.signal,
         });
 
+        clearTimeout(timeout);
         const result = await response.json();
-        console.log('Telegram API Response:', result);
+        console.log('Telegram Response:', JSON.stringify(result));
 
         if (!result.ok) {
-            console.error('Telegram API Error:', result);
+            console.error('Telegram Error:', result);
             return NextResponse.json({ 
-                error: result.description || 'Failed to upload file to Telegram.',
+                error: result.description || 'Failed to upload',
                 details: result 
             }, { status: 500 });
         }
 
-        if (!result.result?.document) {
-            console.error('No document in response:', result);
-            return NextResponse.json({ error: 'Invalid response from Telegram.' }, { status: 500 });
+        const doc = result.result?.document;
+        if (!doc) {
+            console.error('No document:', result);
+            return NextResponse.json({ error: 'Invalid response' }, { status: 500 });
         }
 
-        const doc = result.result.document;
         const newFile: AppFile = {
             id: doc.file_id,
-            name: doc.file_name || 'Untitled',
-            size: doc.file_size,
-            type: doc.mime_type,
+            name: doc.file_name || file.name || 'Untitled',
+            size: doc.file_size || file.size,
+            type: doc.mime_type || file.type,
             uploadDate: new Date(result.result.date * 1000),
-            url: '#', // URL will be generated on download request
+            url: '#',
             progress: 'complete',
             telegramMessageId: result.result.message_id,
         };
 
+        console.log('Returning file:', newFile);
         return NextResponse.json(newFile, { status: 201 });
 
     } catch (error) {
         console.error('Upload Error:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-        return NextResponse.json({ error: 'Internal server error.', details: errorMessage }, { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 
