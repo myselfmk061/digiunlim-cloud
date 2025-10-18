@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { Cloud } from 'lucide-react';
 import { LoginForm } from '@/components/login-form';
+import { MojoAuthLogin } from '@/components/mojoauth-login';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +19,7 @@ export default function LoginPage() {
         </Button>
       </header>
       <main className="flex flex-1 items-center justify-center p-4">
-        <LoginForm />
+        <MojoAuthLogin />
       </main>
       <Footer />
     </div>
