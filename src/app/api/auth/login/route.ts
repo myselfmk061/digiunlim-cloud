@@ -1,28 +1,54 @@
-
 import { NextResponse } from 'next/server';
+import { Redis } from '@upstash/redis';
+import crypto from 'crypto';
 
-// This is a simplified, insecure login for demonstration purposes.
-// In a real application, use a proper authentication library like NextAuth.js
-// and store hashed passwords in a database.
-const DEMO_PASSWORD = process.env.LOGIN_PASSWORD || 'digiunlim';
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
 export async function POST(request: Request) {
   try {
-    const { password } = await request.json();
+    const { identifier, password } = await request.json();
 
-    if (!password) {
-      return NextResponse.json({ error: 'Password is required' }, { status: 400 });
+    // Hash password
+    const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+
+    // Find user by email, username, or phone
+    let userId = await redis.get(`user:email:${identifier}`) as string;
+    if (!userId) userId = await redis.get(`user:username:${identifier}`) as string;
+    if (!userId) userId = await redis.get(`user:phone:${identifier}`) as string;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    if (password === DEMO_PASSWORD) {
-      // In a real app, you would generate a JWT or session token here.
-      // For this simplified version, we'll just return success.
-      return NextResponse.json({ success: true, message: 'Login successful' });
-    } else {
+    // Get user data
+    const userData = await redis.get(`user:${userId}`);
+    if (!userData) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const user = JSON.parse(userData as string);
+
+    // Verify password
+    if (user.password !== hashedPassword) {
       return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }
+
+    // Generate token
+    const token = crypto.randomUUID();
+    await redis.set(`session:${token}`, userId, { ex: 86400 }); // 24 hours
+
+    return NextResponse.json({
+      success: true,
+      token,
+      email: user.email,
+      phone: user.phone,
+      username: user.username,
+    });
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json({ error: 'An internal server error occurred' }, { status: 500 });
+    return NextResponse.json({ error: 'Login failed' }, { status: 500 });
   }
 }
