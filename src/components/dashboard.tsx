@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useRef, ChangeEvent, useEffect, Suspense, useMemo, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Cloud,
@@ -70,40 +70,16 @@ function DashboardContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profilePicInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [shareLink, setShareLink] = useState('');
   const [fileToDelete, setFileToDelete] = useState<AppFile | null>(null);
-  const [userPhoneNumber, setUserPhoneNumber] = useState<string | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>('https://picsum.photos/100/100');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    const storedPhoneNumber = localStorage.getItem('userPhoneNumber');
-    
-    if (storedPhoneNumber) {
-        setIsAuthenticated(true);
-        setUserPhoneNumber(storedPhoneNumber);
-        
-        // This logic handles showing the "Verified" message on first login.
-        const isFreshLogin = searchParams.has('verified');
-        if (isFreshLogin) {
-            setShowVerificationMessage(true);
-            setTimeout(() => {
-                setShowVerificationMessage(false);
-                // Clean the URL
-                router.replace('/dashboard', undefined); 
-            }, 2500);
-        }
-    } else {
-        router.push('/login');
-    }
-
     const storedProfilePic = localStorage.getItem('profilePic');
     if (storedProfilePic) {
       setProfilePic(storedProfilePic);
@@ -117,14 +93,12 @@ function DashboardContent() {
             localStorage.removeItem('userFiles');
         }
     }
-  }, [searchParams, router]);
+  }, []);
 
   useEffect(() => {
     // Persist files to localStorage whenever they change
-    if (isAuthenticated) {
-        localStorage.setItem('userFiles', JSON.stringify(files));
-    }
-  }, [files, isAuthenticated]);
+    localStorage.setItem('userFiles', JSON.stringify(files));
+  }, [files]);
   
   const handleProfilePicChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -141,11 +115,10 @@ function DashboardContent() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userPhoneNumber');
+    localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('profilePic');
     // We keep 'userFiles' so they are not lost on logout, but you could clear it too.
     // localStorage.removeItem('userFiles'); 
-    setIsAuthenticated(false);
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     router.push('/');
   };
@@ -377,25 +350,6 @@ function DashboardContent() {
     [files, searchTerm]
   );
 
-  if (showVerificationMessage) {
-    return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-            <Card className="p-8 text-center shadow-2xl">
-                <CardContent className="flex flex-col items-center gap-4">
-                    <CheckCircle2 className="h-16 w-16 text-green-500 animate-pulse" />
-                    <h1 className="text-2xl font-bold">Successfully verified by Telegram</h1>
-                    <p className="text-muted-foreground">Redirecting to your dashboard...</p>
-                </CardContent>
-            </Card>
-        </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <DashboardLoading />;
-  }
-
-
   return (
     <div className="flex min-h-screen flex-col bg-secondary/30">
         <input
@@ -443,8 +397,8 @@ function DashboardContent() {
 
       <main className="container mx-auto flex-1 p-4 md:p-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Welcome back!</h1>
-          {userPhoneNumber && <p className="text-muted-foreground">Signed in as {userPhoneNumber}</p>}
+          <h1 className="text-3xl font-bold">Welcome!</h1>
+          <p className="text-muted-foreground">Manage your files in one place.</p>
         </div>
         <div
           className={`relative mb-8 cursor-pointer rounded-lg border-2 border-dashed border-primary/50 bg-background p-8 text-center transition-colors duration-300 hover:border-primary hover:bg-primary/5 ${
@@ -593,7 +547,7 @@ function DashboardContent() {
                         <Download className="mr-2 h-4 w-4" /> Download
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDelete(file); }} className="text-red-500 focus:text-red-400">
+                    <DropdownMenuItem onClick={(e_ => { e_.stopPropagation(); handleDelete(file); })} className="text-red-500 focus:text-red-400">
                       <Trash2 className="mr-2 h-4 w-4" /> Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
