@@ -1,15 +1,10 @@
-# How to Create Telegram Bots and Get Credentials
+# How to Create a Telegram Bot and Get Credentials
 
-This guide will show you how to create **two** separate Telegram bots to get the credentials needed for your application to work.
-
--   **Verification Bot**: Sends login links to users.
--   **Storage Bot**: Stores all the uploaded files in a private channel.
+This guide will show you how to create a Telegram bot and a private channel to get the credentials needed for your application. This setup will act as your free, unlimited file storage backend.
 
 ---
 
-### Part 1: Create the Verification Bot
-
-This bot will handle sending secure login links to your users' Telegram accounts.
+### Step 1: Create the Telegram Bot
 
 1.  **Talk to the BotFather:**
     *   Open your Telegram app.
@@ -20,44 +15,33 @@ This bot will handle sending secure login links to your users' Telegram accounts
 
 2.  **Create a New Bot:**
     *   Type the command `/newbot` and send it.
-    *   BotFather will ask for a **name**. Choose something clear, like `My App Verifier`.
-    *   Next, it will ask for a **username**. This must be unique and end in `bot` (e.g., `MyAppVerifierBot`). **Save this username.**
+    *   BotFather will ask for a **name**. This can be anything (e.g., `My App Storage`).
+    *   Next, it will ask for a **username**. This must be unique and end in `bot` (e.g., `MyAppStorageBot`).
 
-3.  **Get Your Verification Bot Credentials:**
+3.  **Get Your Bot Token:**
     *   Once you've chosen a unique username, BotFather will give you a **token**.
     *   **Copy this token.** It will look like `7123456789:AAG_AbcDef1234GhijKlmnOpqrstUvWxYz`.
-    *   You now have your two verification credentials:
-        *   `VERIFICATION_BOT_TOKEN`: The token you just copied.
-        *   `NEXT_PUBLIC_VERIFICATION_BOT_USERNAME`: The username you chose (e.g., `MyAppVerifierBot`).
+    *   This is your `TELEGRAM_BOT_TOKEN`.
 
     ![Step 3: Get Token](https://storage.googleapis.com/studioprod-%E2%80%94%CE%B2%CE%BF%CE%B7%CE%B8%CF%8C%CF%82.appspot.com/assets/telegram_token.png)
 
 ---
 
-### Part 2: Create the Storage Bot and Private Channel
+### Step 2: Create a Private Channel and Get its ID
 
-This bot will be responsible for uploading and managing files in a private channel that acts as your unlimited storage backend.
+This channel is where your bot will upload all the files.
 
-1.  **Create the Storage Bot:**
-    *   In your conversation with BotFather, type `/newbot` again.
-    *   Give it a distinct **name**, like `My App Storage`.
-    *   Give it a unique **username**, like `MyAppStorageBot`.
-
-2.  **Get Your Storage Bot Token:**
-    *   BotFather will give you a second, different token.
-    *   **Copy this new token.** This is your `STORAGE_BOT_TOKEN`. Save it.
-
-3.  **Create a Private Channel:**
+1.  **Create a Private Channel:**
     *   In Telegram's main menu, create a **New Channel**.
-    *   Give it a name (e.g., "App Storage") and make sure you set it to **Private Channel**.
+    *   Give it a name (e.g., "App File Storage") and make sure you set it to **Private Channel**.
 
-4.  **Add the Storage Bot as an Admin:**
+2.  **Add Your Bot as an Admin:**
     *   Go to your new channel's settings.
     *   Go to **Administrators** > **Add Admin**.
-    *   Search for your **Storage Bot's username** (e.g., `MyAppStorageBot`) and select it.
+    *   Search for your **bot's username** (e.g., `MyAppStorageBot`) and select it.
     *   Ensure it has permission to **Post Messages**. Other permissions are not required.
 
-5.  **Get the Channel's Chat ID:**
+3.  **Get the Channel's Chat ID:**
     *   Send any test message to your new private channel (e.g., "hello").
     *   Forward this message to a special bot like `@ShowJsonBot` or `@JsonDumpBot`.
     *   The ID bot will reply with JSON text. Look for `forward_from_chat`. The `id` inside it is your channel's Chat ID. It will be a negative number, starting with `-100...` (e.g., `-1001234567890`).
@@ -69,9 +53,7 @@ This bot will be responsible for uploading and managing files in a private chann
 
 ### You're Done!
 
-You now have all four required credentials. You can add these to your project's `.env` file or Vercel environment variables.
+You now have the two required credentials. You can add these to your project's `.env` file.
 
--   `VERIFICATION_BOT_TOKEN`
--   `NEXT_PUBLIC_VERIFICATION_BOT_USERNAME`
--   `STORAGE_BOT_TOKEN`
+-   `TELEGRAM_BOT_TOKEN`
 -   `TELEGRAM_CHAT_ID`
