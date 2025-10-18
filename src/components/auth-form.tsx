@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Cloud, Loader2, Mail, Phone, User, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import crypto from 'crypto-js';
 
 const LoginSchema = z.object({
   identifier: z.string().min(1, 'Email, phone, or username required'),
@@ -48,21 +49,21 @@ export function AuthForm() {
   async function onLogin(data: z.infer<typeof LoginSchema>) {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const hashedPassword = crypto.SHA256(data.password).toString();
+      
+      const user = users.find((u: any) => 
+        (u.email === data.identifier || u.username === data.identifier || u.phone === data.identifier) &&
+        u.password === hashedPassword
+      );
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Login failed');
+      if (!user) {
+        throw new Error('Invalid credentials');
       }
 
-      localStorage.setItem('userToken', result.token);
-      localStorage.setItem('userEmail', result.email);
-      localStorage.setItem('userPhoneNumber', result.phone);
+      localStorage.setItem('userToken', crypto.lib.WordArray.random(16).toString());
+      localStorage.setItem('userEmail', user.email);
+      localStorage.setItem('userPhoneNumber', user.phone);
       
       toast({ title: 'Login Successful!', description: 'Welcome back!' });
       router.push('/dashboard?verified=true');
@@ -80,17 +81,24 @@ export function AuthForm() {
   async function onRegister(data: z.infer<typeof RegisterSchema>) {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Registration failed');
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      if (users.find((u: any) => u.email === data.email)) {
+        throw new Error('Email already registered');
       }
+
+      const hashedPassword = crypto.SHA256(data.password).toString();
+      const newUser = {
+        id: crypto.lib.WordArray.random(16).toString(),
+        username: data.username,
+        email: data.email,
+        phone: data.phone,
+        password: hashedPassword,
+        createdAt: new Date().toISOString(),
+      };
+
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
 
       toast({ title: 'Registration Successful!', description: 'Please login to continue' });
       setMode('login');

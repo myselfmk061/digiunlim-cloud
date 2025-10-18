@@ -56,10 +56,19 @@ export async function POST(request: NextRequest) {
         });
 
         const result = await response.json();
+        console.log('Telegram API Response:', result);
 
-        if (!result.ok || !result.result.document) {
+        if (!result.ok) {
             console.error('Telegram API Error:', result);
-            return NextResponse.json({ error: 'Failed to upload file to Telegram.' }, { status: 500 });
+            return NextResponse.json({ 
+                error: result.description || 'Failed to upload file to Telegram.',
+                details: result 
+            }, { status: 500 });
+        }
+
+        if (!result.result?.document) {
+            console.error('No document in response:', result);
+            return NextResponse.json({ error: 'Invalid response from Telegram.' }, { status: 500 });
         }
 
         const doc = result.result.document;

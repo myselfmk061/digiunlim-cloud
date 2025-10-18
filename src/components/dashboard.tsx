@@ -135,7 +135,7 @@ function DashboardContent() {
         const formData = new FormData();
         formData.append('file', file);
 
-        const tempId = `temp-${Date.now()}`;
+        const tempId = `temp-${Date.now()}-${Math.random()}`;
         const tempFile: AppFile = {
             id: tempId,
             name: file.name,
@@ -164,16 +164,16 @@ function DashboardContent() {
             }
 
             const newFile = await response.json();
-            setFiles(prev => prev.map(f => f.id === tempId ? newFile : f));
+            setFiles(prev => prev.map(f => f.id === tempId ? { ...newFile, progress: 'complete' } : f));
             toast({
-                title: 'Upload Complete',
-                description: `"${newFile.name}" has been successfully uploaded.`,
+                title: '✅ Upload Complete',
+                description: `${newFile.name} uploaded successfully!`,
             });
         } catch (error) {
             console.error('Upload error:', error);
-            setFiles(prev => prev.filter(f => f.id !== tempId)); // Remove temp file on error
+            setFiles(prev => prev.filter(f => f.id !== tempId));
             toast({
-                title: 'Upload Failed',
+                title: '❌ Upload Failed',
                 description: error instanceof Error ? error.message : `Could not upload "${file.name}".`,
                 variant: 'destructive',
             });
@@ -478,20 +478,31 @@ function DashboardContent() {
           </div>
         )}
 
-        <div className="space-y-4">
-          {files.filter(f => f.progress === 'uploading').map(file => (
-            <Card key={file.id} className="overflow-hidden animate-pulse">
-              <CardContent className="flex items-center gap-4 p-4">
-                <div className="flex-shrink-0">{getFileIcon(file.type)}</div>
-                <div className="flex-1 overflow-hidden">
-                  <p className="truncate font-medium">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">Uploading...</p>
-                </div>
-                <Progress value={50} className="h-2 w-24" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {files.filter(f => f.progress === 'uploading').length > 0 && (
+          <div className="mb-6 space-y-3">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              Uploading Files...
+            </h3>
+            {files.filter(f => f.progress === 'uploading').map(file => (
+              <Card key={file.id} className="overflow-hidden border-primary/50">
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="flex-shrink-0">{getFileIcon(file.type)}</div>
+                  <div className="flex-1 overflow-hidden">
+                    <p className="truncate font-medium">{file.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {(file.size / (1024 * 1024)).toFixed(2)} MB • Uploading to Telegram...
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    <Progress value={65} className="h-2 w-24" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {filteredFiles.length === 0 && searchTerm && (
           <div className="mt-16 text-center">
