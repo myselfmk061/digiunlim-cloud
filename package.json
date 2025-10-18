@@ -40,7 +40,6 @@
     "dotenv": "^16.4.5",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.475.0",
-    "mojoauth-web-sdk": "^1.17.19",
     "next": "^15.3.3",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",
